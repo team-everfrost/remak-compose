@@ -14,13 +14,13 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.everfrost.remak_compose.view.account.onboarding.OnboardingScreen
 import com.everfrost.remak_compose.view.account.signin.SignInScreen
+import com.everfrost.remak_compose.view.home.main.HomeMainScreen
 
 
 enum class RemakScreen(val route: String, val title: String, val icon: Int? = null) {
     OnBoarding("onBoarding", "온보딩"),
     SignIn("signIn", "로그인"),
-
-
+    Main("main", "메인", null),
 }
 
 fun NavGraphBuilder.composableWithAnimation(
@@ -82,6 +82,13 @@ fun RemakApp(
             route = RemakScreen.SignIn.route
         ) { navBackStackEntry ->
             SignInScreen(navController = navController)
+        }
+
+        composable(
+            route = RemakScreen.Main.route
+        ) {
+            // MainScreen(navController = navController)
+            HomeMainScreen()
         }
 
 

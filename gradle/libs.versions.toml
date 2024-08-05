@@ -15,6 +15,13 @@ animation = "0.34.0"
 # hilt
 hilt = "2.49"
 hiltCompose = "1.2.0"
+#glide
+glide = "2.3.6"
+# retrofit
+retrofit = "2.11.0"
+# dataStore
+dataStore = "1.1.0"
+
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -39,6 +46,15 @@ androidx-navigation-animation = { group = "com.google.accompanist", name = "acco
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }
 hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltCompose" }
+#glide
+glide = { group = "com.github.skydoves", name = "landscapist-glide", version.ref = "glide" }
+# retrofit
+retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+retrofit-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
+# dataStore
+dataStore = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "dataStore" }
+
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

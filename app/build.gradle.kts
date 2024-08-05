@@ -75,5 +75,13 @@ dependencies {
     implementation(libs.hilt.android)
     implementation(libs.hilt.navigation.compose)
     kapt(libs.hilt.compiler)
+    // glide
+    implementation(libs.glide)
+    //retrofit
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.gson)
+    // dataStore
+    implementation(libs.dataStore)
+
 }
 

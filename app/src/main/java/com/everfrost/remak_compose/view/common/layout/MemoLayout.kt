@@ -27,12 +27,25 @@ import com.everfrost.remak_compose.ui.theme.black3
 import com.everfrost.remak_compose.ui.theme.pretendard
 import com.everfrost.remak_compose.ui.theme.strokeGray2
 import com.everfrost.remak_compose.ui.theme.white
+import com.everfrost.remak_compose.view.tool.ViewTool
 
 
 @Composable
 fun MemoLayout(
-    modifier: Modifier
+    modifier: Modifier,
+    date: String,
+    isSelected: Boolean,
+    content: String,
+    isEditMode: Boolean
+
 ) {
+    val lines = content.split("\n")
+    val firstPart = lines.firstOrNull() ?: ""
+    val secondPart = if (lines.size > 1) {
+        lines.subList(1, lines.size).joinToString("\n")
+    } else {
+        ""
+    }
     Box(
         modifier = modifier
             .shadow(
@@ -49,7 +62,7 @@ fun MemoLayout(
                 .fillMaxWidth()
                 .fillMaxHeight(),
         ) {
-            if (false) {
+            if (isEditMode) {
                 Checkbox(
                     checked = false,
                     onCheckedChange = {},
@@ -60,12 +73,12 @@ fun MemoLayout(
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
-                    text = "“iOS 앱도 구글 툴로”··· 구글, 다트 3와 플러터 3.10 출시",
+                    text = firstPart,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     style = TextStyle(
                         color = black1,
-                        fontSize = 16.sp,
+                        fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
                         fontFamily = pretendard
 
@@ -73,7 +86,7 @@ fun MemoLayout(
                 )
                 Text(
                     modifier = Modifier.padding(top = 4.dp),
-                    text = "“iOS 앱도 구글 툴로”··· 구글, 다트 3와 플러터 3.10 출시",
+                    text = secondPart,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     style = TextStyle(
@@ -87,7 +100,7 @@ fun MemoLayout(
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
                     modifier = Modifier.padding(top = 4.dp),
-                    text = "메모 | YYYY.MM.DD",
+                    text = "메모 | ${ViewTool.dateFormatting(date)}",
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     style = TextStyle(

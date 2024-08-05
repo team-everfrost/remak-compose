@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerIcon.Companion.Text
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -33,12 +34,19 @@ import com.everfrost.remak_compose.ui.theme.black3
 import com.everfrost.remak_compose.ui.theme.pretendard
 import com.everfrost.remak_compose.ui.theme.strokeGray2
 import com.everfrost.remak_compose.ui.theme.white
+import com.everfrost.remak_compose.view.tool.ViewTool
 import com.skydoves.landscapist.glide.GlideImage
 
 
 @Composable
 fun ImageLayout(
-    modifier: Modifier
+    modifier: Modifier,
+    title: String,
+    date: String,
+    thumbnailUrl: String?,
+    summary: String,
+    status: String,
+    isSelected: Boolean
 ) {
     Box(
         modifier = modifier
@@ -57,7 +65,7 @@ fun ImageLayout(
                 .fillMaxHeight(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            if (false) {
+            if (isSelected) {
                 Checkbox(
                     checked = false,
                     onCheckedChange = {},
@@ -68,12 +76,12 @@ fun ImageLayout(
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
-                    text = "“iOS 앱도 구글 툴로”··· 구글, 다트 3와 플러터 3.10 출시",
+                    text = title,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     style = TextStyle(
                         color = black1,
-                        fontSize = 16.sp,
+                        fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
                         fontFamily = pretendard
 
@@ -81,7 +89,21 @@ fun ImageLayout(
                 )
                 Text(
                     modifier = Modifier.padding(top = 4.dp),
-                    text = "“iOS 앱도 구글 툴로”··· 구글, 다트 3와 플러터 3.10 출시",
+                    text = when (status) {
+                        "EMBED_PENDING" -> "AI가 곧 이미지를 분석할거에요."
+                        "EMBED_PROCESSING" -> "AI가 이미지를 분석중이에요!"
+                        "EMBED_REJECTED" -> "AI가 이미지 분석에 실패했어요."
+                        "COMPLETED" -> {
+                            if (summary.contains("\n")) {
+                                val index = summary.indexOf("\n")
+                                summary.substring(0, index)
+                            } else {
+                                summary
+                            }
+                        }
+
+                        else -> ""
+                    },
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     style = TextStyle(
@@ -95,7 +117,7 @@ fun ImageLayout(
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
                     modifier = Modifier.padding(top = 4.dp),
-                    text = "이미지 | YYYY.MM.DD",
+                    text = "이미지 | ${ViewTool.dateFormatting(date)}",
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     style = TextStyle(
@@ -107,7 +129,7 @@ fun ImageLayout(
                     )
                 )
             }
-            if (true) {
+            if (thumbnailUrl.isNullOrEmpty()) {
                 Image(
                     modifier = Modifier
                         .padding(start = 16.dp)
@@ -118,7 +140,7 @@ fun ImageLayout(
                 )
             } else {
                 GlideImage(
-                    imageModel = { R.drawable.image_main },
+                    imageModel = { thumbnailUrl },
                     modifier = Modifier
                         .size(80.dp)
                         .align(Alignment.CenterVertically)
@@ -133,3 +155,4 @@ fun ImageLayout(
         }
     }
 }
+

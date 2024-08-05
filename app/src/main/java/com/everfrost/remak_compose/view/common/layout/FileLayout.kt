@@ -32,11 +32,17 @@ import com.everfrost.remak_compose.ui.theme.black3
 import com.everfrost.remak_compose.ui.theme.pretendard
 import com.everfrost.remak_compose.ui.theme.strokeGray2
 import com.everfrost.remak_compose.ui.theme.white
+import com.everfrost.remak_compose.view.tool.ViewTool
 
 
 @Composable
 fun FileLayout(
-    modifier: Modifier
+    modifier: Modifier,
+    title: String,
+    date: String,
+    summary: String?,
+    status: String,
+    isSelected: Boolean
 ) {
     Box(
         modifier = modifier
@@ -55,7 +61,7 @@ fun FileLayout(
                 .fillMaxHeight(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            if (false) {
+            if (isSelected) {
                 Checkbox(
                     checked = false,
                     onCheckedChange = {},
@@ -66,12 +72,12 @@ fun FileLayout(
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
-                    text = "“iOS 앱도 구글 툴로”··· 구글, 다트 3와 플러터 3.10 출시",
+                    text = title,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     style = TextStyle(
                         color = black1,
-                        fontSize = 16.sp,
+                        fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
                         fontFamily = pretendard
 
@@ -79,7 +85,21 @@ fun FileLayout(
                 )
                 Text(
                     modifier = Modifier.padding(top = 4.dp),
-                    text = "“iOS 앱도 구글 툴로”··· 구글, 다트 3와 플러터 3.10 출시",
+                    text = when (status) {
+                        "EMBED_PENDING" -> "AI가 곧 파일을 분석할거에요."
+                        "EMBED_PROCESSING" -> "AI가 파일을 분석중이에요!"
+                        "EMBED_REJECTED" -> "AI가 파일 분석에 실패했어요."
+                        "COMPLETED" -> {
+                            if (summary!!.contains("\n")) {
+                                val index = summary.indexOf("\n")
+                                summary.substring(0, index)
+                            } else {
+                                summary!!
+                            }
+                        }
+
+                        else -> ""
+                    },
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     style = TextStyle(
@@ -93,7 +113,7 @@ fun FileLayout(
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
                     modifier = Modifier.padding(top = 4.dp),
-                    text = "이미지 | YYYY.MM.DD",
+                    text = "파일 | ${ViewTool.dateFormatting(date)}",
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     style = TextStyle(

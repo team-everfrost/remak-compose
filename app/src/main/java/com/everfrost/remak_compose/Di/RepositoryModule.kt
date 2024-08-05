@@ -3,6 +3,8 @@ package com.everfrost.remak_compose.Di
 import com.everfrost.remak_compose.dataSource.RemoteDataSource
 import com.everfrost.remak_compose.repository.AccountRepository
 import com.everfrost.remak_compose.repository.AccountRepositoryImpl
+import com.everfrost.remak_compose.repository.MainRepository
+import com.everfrost.remak_compose.repository.MainRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,5 +19,10 @@ object RepositoryModule {
     @Singleton
     fun provideAccountRepository(remoteDataSource: RemoteDataSource): AccountRepository =
         AccountRepositoryImpl(remoteDataSource)
+
+    @Provides
+    @Singleton
+    fun provideMainRepository(remoteDataSource: RemoteDataSource): MainRepository =
+        MainRepositoryImpl(remoteDataSource)
 
 }

@@ -1,8 +1,11 @@
 package com.everfrost.remak_compose.service
 
 import com.everfrost.remak_compose.model.account.SignInModel
+import com.everfrost.remak_compose.model.home.main.MainListModel
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Query
 
 
 interface ApiService {
@@ -14,6 +17,15 @@ interface ApiService {
     //로그인
     @POST("auth/local/login")
     suspend fun signIn(@Body body: SignInModel.RequestBody): retrofit2.Response<SignInModel.ResponseBody>
+
+    //home ---------------------------------------------------------
+    //메인 리스트
+    @GET("document")
+    suspend fun getMainList(
+        @Query("cursor") cursor: String?,
+        @Query("doc-id") docID: String?,
+        @Query("limit") limit: Int? = 20
+    ): retrofit2.Response<MainListModel.Response>
 
 
 }

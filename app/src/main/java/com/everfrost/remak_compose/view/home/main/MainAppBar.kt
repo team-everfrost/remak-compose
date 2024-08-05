@@ -1,7 +1,6 @@
 package com.everfrost.remak_compose.view.home.main
 
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,8 +23,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.everfrost.remak_compose.R
 import com.everfrost.remak_compose.ui.theme.black1
-import com.everfrost.remak_compose.ui.theme.black4
 import com.everfrost.remak_compose.ui.theme.white
+import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
 fun MainAppBar(
@@ -51,10 +50,8 @@ fun MainAppBar(
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.image_logo),
-                    contentDescription = null
-                )
+
+                GlideImage(imageModel = { R.drawable.image_logo })
 
                 Row {
                     IconButton(

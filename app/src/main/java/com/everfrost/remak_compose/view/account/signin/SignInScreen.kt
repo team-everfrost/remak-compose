@@ -3,17 +3,23 @@ package com.everfrost.remak_compose.view.account.signin
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -22,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.everfrost.remak_compose.model.APIResponse
 import com.everfrost.remak_compose.ui.theme.pretendard
 import com.everfrost.remak_compose.ui.theme.red1
 import com.everfrost.remak_compose.ui.theme.white
@@ -40,9 +47,12 @@ fun SignInScreen(
     val viewModel: SignInVIewModel = hiltViewModel()
     val email by viewModel.email.collectAsState()
     val isValidEmail by viewModel.isValidEmail.collectAsState()
-    val emailError by viewModel.emailError.collectAsState()
     val password by viewModel.password.collectAsState()
-    val passwordError by viewModel.passwordError.collectAsState()
+    val emailCheckState by viewModel.emailCheckState.collectAsState()
+    val signInState by viewModel.signInState.collectAsState()
+
+    // FocusRequester를 사용하여 포커스를 관리
+    val passwordFocusRequester = remember { FocusRequester() }
     Scaffold(
         containerColor = white,
         topBar = {
@@ -50,7 +60,8 @@ fun SignInScreen(
                 navController = navController,
                 title = "로그인"
             )
-        }
+        },
+        modifier = Modifier.imePadding()
     ) { innerPadding ->
         Box(
             modifier = Modifier
@@ -77,9 +88,13 @@ fun SignInScreen(
                         keyboardType = KeyboardType.Email,
                         imeAction = ImeAction.Next
                     ),
-                    isEnable = if (emailError == true) false else true
+                    isEnable = if (emailCheckState is APIResponse.Success) {
+                        false
+                    } else {
+                        true
+                    }
                 )
-                if (emailError == true) {
+                if (emailCheckState is APIResponse.Error) {
                     Text(
                         text = "이메일을 다시확인해주세요",
                         modifier = Modifier.padding(top = 12.dp),
@@ -91,7 +106,7 @@ fun SignInScreen(
                         )
                     )
                 }
-                if (true) {
+                if (emailCheckState is APIResponse.Success) {
                     AccountTextField(
                         value = password,
                         onValueChange = {
@@ -101,7 +116,8 @@ fun SignInScreen(
                             .padding(top = 7.dp)
                             .fillMaxWidth()
                             .customHeightBasedOnWidth(0.17f)
-                            .background(white),
+                            .background(white)
+                            .focusRequester(passwordFocusRequester),
                         isError = false,
                         placeholder = "비밀번호를 입력해주세요",
                         keyboardOptions = KeyboardOptions.Default.copy(
@@ -110,6 +126,9 @@ fun SignInScreen(
                         ),
                         isPassword = true
                     )
+                    LaunchedEffect(Unit) {
+                        passwordFocusRequester.requestFocus()
+                    }
 
                 } else {
                     Box(
@@ -121,7 +140,7 @@ fun SignInScreen(
                     )
                 }
 
-                if (true) {
+                if (signInState is APIResponse.Error) {
                     Text(
                         text = "비밀번호를 확인해주세요",
                         style = TextStyle(
@@ -140,15 +159,31 @@ fun SignInScreen(
                             .background(white)
                     )
                 }
+                Spacer(modifier = Modifier.weight(1f))
 
                 PrimaryButton(
                     modifier = Modifier
-                        .padding(top = 50.dp)
+                        .padding(bottom = 30.dp)
                         .fillMaxWidth()
                         .customHeightBasedOnWidth(0.17f),
-                    onClick = { },
-                    isEnable = true,
-                    text = "확인"
+                    onClick = {
+                        if (emailCheckState is APIResponse.Success) {
+                            viewModel.signIn(email, password)
+                        } else {
+                            viewModel.checkEmail(email)
+
+                        }
+                    },
+                    isEnable = if (emailCheckState is APIResponse.Success && password.isNotEmpty()) {
+                        true
+                    } else {
+                        isValidEmail
+                    },
+                    text = if (emailCheckState is APIResponse.Success) {
+                        "로그인"
+                    } else {
+                        "다음으로"
+                    }
                 )
 
 

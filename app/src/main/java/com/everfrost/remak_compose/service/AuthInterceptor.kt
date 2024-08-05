@@ -12,12 +12,12 @@ class AuthInterceptor @Inject constructor(private val tokenRepository: TokenRepo
         var request = chain.request()
 
         runBlocking {
-//            val tokenData = tokenRepository.fetchToken()
-//            if (tokenData != null) {
-//                request = request.newBuilder()
-//                    .addHeader("Authorization", "Bearer ${tokenData.accessToken}")
-//                    .build()
-//            }
+            val tokenData = tokenRepository.fetchToken()
+            if (tokenData != null) {
+                request = request.newBuilder()
+                    .addHeader("Authorization", "Bearer ${tokenData.accessToken}")
+                    .build()
+            }
         }
 
         return chain.proceed(request)

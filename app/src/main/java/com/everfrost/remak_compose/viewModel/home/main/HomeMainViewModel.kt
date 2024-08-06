@@ -47,23 +47,28 @@ class HomeMainViewModel @Inject constructor(
 
     private var cursor: String? = null
     private var docID: String? = null
+    private val _isDataEnd = MutableStateFlow(false)
+    val isDataEnd: StateFlow<Boolean> = _isDataEnd
 
     private var currentDateType: String? = null
 
-    private val _isRefreshing = MutableStateFlow(false)
-    val isRefreshing: StateFlow<Boolean>
-        get() = _isRefreshing
-
 
     fun fetchMainList() {
+        if (isDataEnd.value) return
         _mainListState.value = APIResponse.Loading()
         viewModelScope.launch {
             val response = mainRepository.getMainList(cursor, docID)
             if (response is APIResponse.Success) {
-                cursor = response.data!!.data.last().createdAt
-                docID = response.data.data.last().docId
                 _mainListState.value = response
 
+                if (response.data!!.data.isEmpty()) {
+                    _isDataEnd.value = true
+                    return@launch
+                }
+                cursor = response.data!!.data.last().createdAt
+                docID = response.data.data.last().docId
+
+                val tmpData = _mainList.value.toMutableList()
                 val newList = mutableListOf<MainListModel.Data>()
 
                 for (data in response.data.data) {
@@ -90,9 +95,10 @@ class HomeMainViewModel @Inject constructor(
                             )
                         )
                     }
+                    tmpData.add(data)
                     newList.add(data)
                 }
-                _mainList.value = newList
+                _mainList.value = tmpData
 
 
             } else {
@@ -139,14 +145,12 @@ class HomeMainViewModel @Inject constructor(
         return userZonedDateTime.format(formatter)
     }
 
-    fun testRefresh() {
-        _isRefreshing.value = true
-
-        viewModelScope.launch {
-            delay(2000)
-            _isRefreshing.value = false
-        }
-
+    fun resetMainList() {
+        cursor = null
+        docID = null
+        _mainList.value = emptyList()
+        _mainListState.value = APIResponse.Empty()
+        _isDataEnd.value = false
     }
 
 

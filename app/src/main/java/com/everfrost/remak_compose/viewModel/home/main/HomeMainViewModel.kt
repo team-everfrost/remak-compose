@@ -52,11 +52,18 @@ class HomeMainViewModel @Inject constructor(
 
     private var currentDateType: String? = null
 
+    private val _isEditMode = MutableStateFlow(false)
+    val isEditMode: StateFlow<Boolean> = _isEditMode
+
+    private val _isInit = MutableStateFlow(false)
+    val isInit: StateFlow<Boolean> = _isInit
 
     fun fetchMainList() {
+        _isInit.value = true
         if (isDataEnd.value) return
         _mainListState.value = APIResponse.Loading()
         viewModelScope.launch {
+            Log.d("메인", "fetchMainList: $cursor, $docID")
             val response = mainRepository.getMainList(cursor, docID)
             if (response is APIResponse.Success) {
                 _mainListState.value = response
@@ -77,7 +84,7 @@ class HomeMainViewModel @Inject constructor(
                     val dateType = classifyDate(data.updatedAt!!.toString())
                     if (dateType != currentDateType) {
                         currentDateType = dateType
-                        newList.add(
+                        tmpData.add(
                             MainListModel.Data(
                                 docId = null,
                                 title = null,
@@ -96,9 +103,9 @@ class HomeMainViewModel @Inject constructor(
                         )
                     }
                     tmpData.add(data)
-                    newList.add(data)
                 }
                 _mainList.value = tmpData
+                Log.d("메인", "fetchMainList: ${_mainList.value}")
 
 
             } else {
@@ -107,6 +114,7 @@ class HomeMainViewModel @Inject constructor(
                     data = _mainListState.value.data,
                     errorCode = response.errorCode ?: "500",
                 )
+                Log.d("메인", "fetchMainList: ${response.message}")
             }
         }
     }
@@ -151,6 +159,11 @@ class HomeMainViewModel @Inject constructor(
         _mainList.value = emptyList()
         _mainListState.value = APIResponse.Empty()
         _isDataEnd.value = false
+        _isInit.value = false
+    }
+
+    fun toggleEditMode() {
+        _isEditMode.value = !_isEditMode.value
     }
 
 

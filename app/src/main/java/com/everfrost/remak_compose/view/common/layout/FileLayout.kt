@@ -1,8 +1,12 @@
 package com.everfrost.remak_compose.view.common.layout
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,10 +20,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -35,6 +42,7 @@ import com.everfrost.remak_compose.ui.theme.white
 import com.everfrost.remak_compose.view.tool.ViewTool
 
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FileLayout(
     modifier: Modifier,
@@ -42,8 +50,12 @@ fun FileLayout(
     date: String,
     summary: String?,
     status: String,
-    isSelected: Boolean
+    isSelected: Boolean,
+    isEditMode: Boolean,
+    onShortTab: () -> Unit,
+    onLongTab: () -> Unit
 ) {
+    val coroutineScope = rememberCoroutineScope()
     Box(
         modifier = modifier
             .shadow(
@@ -54,6 +66,12 @@ fun FileLayout(
             .border(1.dp, strokeGray2, shape = RoundedCornerShape(16.dp))
             .background(white, shape = RoundedCornerShape(16.dp))
             .padding(vertical = 20.dp, horizontal = 16.dp)
+            .combinedClickable(
+                onClick = onShortTab,
+                onLongClick = onLongTab,
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            )
     ) {
         Row(
             modifier = Modifier
@@ -61,7 +79,7 @@ fun FileLayout(
                 .fillMaxHeight(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            if (isSelected) {
+            if (isEditMode) {
                 Checkbox(
                     checked = false,
                     onCheckedChange = {},

@@ -1,6 +1,7 @@
 package com.everfrost.remak_compose.view.home.main
 
 import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -34,11 +36,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavController
 import com.everfrost.remak_compose.R
 import com.everfrost.remak_compose.model.APIResponse
 import com.everfrost.remak_compose.ui.theme.bgGray2
@@ -46,6 +52,7 @@ import com.everfrost.remak_compose.ui.theme.black3
 import com.everfrost.remak_compose.ui.theme.pretendard
 import com.everfrost.remak_compose.ui.theme.textBlack3
 import com.everfrost.remak_compose.ui.theme.white
+import com.everfrost.remak_compose.view.BottomNav
 import com.everfrost.remak_compose.view.common.layout.FileLayout
 import com.everfrost.remak_compose.view.common.layout.ImageLayout
 import com.everfrost.remak_compose.view.common.layout.LinkLayout
@@ -63,8 +70,10 @@ import kotlinx.coroutines.plus
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
-fun HomeMainScreen() {
-    val viewModel: HomeMainViewModel = hiltViewModel()
+fun HomeMainScreen(
+    navController: NavController,
+    viewModel: HomeMainViewModel
+) {
     val scrollState = rememberLazyListState()
     val scrollUpState by viewModel.scrollUp.collectAsState()
     viewModel.updateScrollPosition(scrollState.firstVisibleItemIndex)
@@ -72,14 +81,19 @@ fun HomeMainScreen() {
     val mainListState by viewModel.mainListState.collectAsState()
     val mainList by viewModel.mainList.collectAsState()
     val isDataEnd by viewModel.isDataEnd.collectAsState()
+    val isEditMode by viewModel.isEditMode.collectAsState()
+    val haptics = LocalHapticFeedback.current
+    val isInit by viewModel.isInit.collectAsState()
 
-    LaunchedEffect(true) {
-        viewModel.fetchMainList()
+    if (!isInit) {
+        LaunchedEffect(Unit) {
+            viewModel.fetchMainList()
+        }
     }
 
     LaunchedEffect(scrollState, viewModel.isDataEnd) {
         snapshotFlow { scrollState.layoutInfo.visibleItemsInfo }
-            .debounce(300L)
+            .debounce(200L)
             .collect { visibleItems ->
                 val lastVisibleItem = visibleItems.lastOrNull()
                 if (lastVisibleItem != null && lastVisibleItem.index >= mainList.size - 1 && mainListState !is APIResponse.Loading && !isDataEnd) {
@@ -93,8 +107,19 @@ fun HomeMainScreen() {
             viewModel.resetMainList()
             viewModel.fetchMainList()
         })
+
+    BackHandler {
+        if (isEditMode) {
+            viewModel.toggleEditMode()
+        }
+    }
     Scaffold(
-        containerColor = white
+        containerColor = white,
+        bottomBar = {
+            if (!isEditMode) {
+                BottomNav(navController = navController)
+            }
+        },
     ) { innerPadding ->
 
         Box(
@@ -142,8 +167,6 @@ fun HomeMainScreen() {
                             color = textBlack3,
                         )
                     )
-
-
                 }
             } else {
                 LazyColumn(
@@ -152,44 +175,62 @@ fun HomeMainScreen() {
                         .fillMaxWidth()
                         .fillMaxHeight()
                         .padding(horizontal = 16.dp),
-                    contentPadding = PaddingValues(top = 100.dp)
+                    contentPadding = PaddingValues(top = 50.dp)
                 ) {
                     items(mainList.size) { index ->
                         when (mainList[index].type) {
                             "MEMO" -> MemoLayout(
                                 modifier = Modifier
-                                    .padding(bottom = 5.dp)
+                                    .padding(bottom = 10.dp)
                                     .fillMaxWidth()
-                                    .customHeightBasedOnWidth(0.4f),
+                                    .height(170.dp),
+
                                 date = mainList[index].updatedAt!!,
                                 isSelected = mainList[index].isSelected,
                                 content = mainList[index].content!!,
-                                isEditMode = false
-                            )
+                                isEditMode = isEditMode,
+
+                                )
 
                             "FILE" -> FileLayout(
                                 modifier = Modifier
-                                    .padding(bottom = 5.dp)
+                                    .padding(bottom = 10.dp)
                                     .fillMaxWidth()
-                                    .customHeightBasedOnWidth(0.4f),
+                                    .height(170.dp),
                                 title = mainList[index].title!!,
                                 date = mainList[index].updatedAt!!,
                                 summary = mainList[index].summary,
                                 status = mainList[index].status!!,
-                                isSelected = mainList[index].isSelected
+                                isSelected = mainList[index].isSelected,
+                                isEditMode = isEditMode,
+                                onShortTab = {
+                                    Log.d("HomeMainScreen", "onShortTab")
+                                },
+                                onLongTab = {
+                                    if (isEditMode) {
+
+                                    } else {
+                                        haptics.performHapticFeedback(
+                                            HapticFeedbackType.LongPress
+                                        )
+                                        viewModel.toggleEditMode()
+                                    }
+                                }
 
                             )
 
                             "WEBPAGE" -> LinkLayout(
                                 modifier = Modifier
-                                    .padding(bottom = 5.dp)
+                                    .padding(bottom = 10.dp)
                                     .fillMaxWidth()
-                                    .customHeightBasedOnWidth(0.4f),
+                                    .height(170.dp),
+
                                 title = mainList[index].title!!,
                                 url = mainList[index].url!!,
                                 status = mainList[index].status!!,
                                 isSelected = mainList[index].isSelected,
-                                isEditMode = false,
+                                isEditMode = isEditMode,
+
                                 summary = mainList[index].summary,
                                 thumbnailUrl = mainList[index].thumbnailUrl
                             )
@@ -197,16 +238,19 @@ fun HomeMainScreen() {
                             "IMAGE" -> {
                                 ImageLayout(
                                     modifier = Modifier
-                                        .padding(bottom = 5.dp)
+                                        .padding(bottom = 10.dp)
                                         .fillMaxWidth()
-                                        .customHeightBasedOnWidth(0.4f),
+                                        .height(170.dp),
+
                                     title = mainList[index].title!!,
                                     date = mainList[index].updatedAt!!,
                                     thumbnailUrl = mainList[index].thumbnailUrl,
                                     summary = mainList[index].summary!!,
                                     status = mainList[index].status!!,
-                                    isSelected = mainList[index].isSelected
-                                )
+                                    isSelected = mainList[index].isSelected,
+                                    isEditMode = isEditMode,
+
+                                    )
                             }
 
                             "DATE" -> Text(

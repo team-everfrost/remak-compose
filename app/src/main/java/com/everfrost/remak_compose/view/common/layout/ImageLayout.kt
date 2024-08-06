@@ -28,6 +28,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
 import com.everfrost.remak_compose.R
 import com.everfrost.remak_compose.ui.theme.black1
 import com.everfrost.remak_compose.ui.theme.black3
@@ -46,7 +48,8 @@ fun ImageLayout(
     thumbnailUrl: String?,
     summary: String,
     status: String,
-    isSelected: Boolean
+    isSelected: Boolean,
+    isEditMode: Boolean
 ) {
     Box(
         modifier = modifier
@@ -65,7 +68,7 @@ fun ImageLayout(
                 .fillMaxHeight(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            if (isSelected) {
+            if (isEditMode) {
                 Checkbox(
                     checked = false,
                     onCheckedChange = {},
@@ -149,7 +152,11 @@ fun ImageLayout(
                             width = 2.dp,
                             color = strokeGray2,
                             shape = RoundedCornerShape(12.dp)
-                        )
+                        ),
+                    requestOptions = {
+                        RequestOptions()
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    },
                 )
             }
         }

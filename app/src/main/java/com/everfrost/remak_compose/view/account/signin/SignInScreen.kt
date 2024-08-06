@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
@@ -32,6 +33,7 @@ import com.everfrost.remak_compose.model.APIResponse
 import com.everfrost.remak_compose.ui.theme.pretendard
 import com.everfrost.remak_compose.ui.theme.red1
 import com.everfrost.remak_compose.ui.theme.white
+import com.everfrost.remak_compose.view.BottomNav
 import com.everfrost.remak_compose.view.account.widget.textfield.AccountTextField
 import com.everfrost.remak_compose.view.common.BackTitleAppBar
 import com.everfrost.remak_compose.view.common.button.PrimaryButton
@@ -61,6 +63,9 @@ fun SignInScreen(
                 title = "로그인"
             )
         },
+        bottomBar = {
+            BottomNav(navController = navController)
+        },
         modifier = Modifier.imePadding()
     ) { innerPadding ->
         Box(
@@ -80,7 +85,7 @@ fun SignInScreen(
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .customHeightBasedOnWidth(0.17f)
+                        .height(63.dp)
                         .background(white),
                     isError = !isValidEmail,
                     placeholder = "이메일을 입력해주세요",
@@ -115,7 +120,8 @@ fun SignInScreen(
                         modifier = Modifier
                             .padding(top = 7.dp)
                             .fillMaxWidth()
-                            .customHeightBasedOnWidth(0.17f)
+                            .height(63.dp)
+
                             .background(white)
                             .focusRequester(passwordFocusRequester),
                         isError = false,
@@ -165,7 +171,8 @@ fun SignInScreen(
                     modifier = Modifier
                         .padding(bottom = 30.dp)
                         .fillMaxWidth()
-                        .customHeightBasedOnWidth(0.17f),
+                        .height(63.dp),
+
                     onClick = {
                         if (emailCheckState is APIResponse.Success) {
                             viewModel.signIn(email, password)

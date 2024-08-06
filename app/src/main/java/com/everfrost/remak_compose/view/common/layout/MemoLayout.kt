@@ -70,11 +70,11 @@ fun MemoLayout(
                 )
             }
             Column(
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
                     text = firstPart,
-                    maxLines = 2,
+                    maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     style = TextStyle(
                         color = black1,
@@ -87,8 +87,7 @@ fun MemoLayout(
                 Text(
                     modifier = Modifier.padding(top = 4.dp),
                     text = secondPart,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 3,
                     style = TextStyle(
                         color = black3,
                         fontSize = 12.sp,

@@ -1,10 +1,17 @@
 package com.everfrost.remak_compose.view
 
+import SearchScreen
+import TagScreen
+import android.util.Log
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
@@ -12,15 +19,22 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.everfrost.remak_compose.R
 import com.everfrost.remak_compose.view.account.onboarding.OnboardingScreen
 import com.everfrost.remak_compose.view.account.signin.SignInScreen
+import com.everfrost.remak_compose.view.collection.CollectionScreen
 import com.everfrost.remak_compose.view.home.main.HomeMainScreen
+import com.everfrost.remak_compose.view.profile.ProfileScreen
 
 
 enum class RemakScreen(val route: String, val title: String, val icon: Int? = null) {
-    OnBoarding("onBoarding", "온보딩"),
-    SignIn("signIn", "로그인"),
-    Main("main", "메인", null),
+    OnBoarding("OnBoarding", "온보딩"),
+    SignIn("SignIn", "로그인"),
+    Main("Main", "메인", icon = R.drawable.icon_home),
+    Search("Search", "검색", icon = R.drawable.icon_search),
+    Tag("Tag", "태그", icon = R.drawable.icon_tag),
+    Collection("Collection", "컬렉션", icon = R.drawable.icon_collection),
+    Profile("Profile", "프로필", icon = R.drawable.icon_profile),
 }
 
 fun NavGraphBuilder.composableWithAnimation(
@@ -69,6 +83,7 @@ fun RemakApp(
     val navController = rememberNavController()
     val navBackStackEntry = navController.currentBackStackEntryAsState()
 
+
     NavHost(
         navController = navController,
         startDestination = startDestination
@@ -85,10 +100,60 @@ fun RemakApp(
         }
 
         composable(
-            route = RemakScreen.Main.route
+            route = RemakScreen.Main.route,
+            enterTransition = { EnterTransition.None },
+            exitTransition = { ExitTransition.None },
+        ) { navBackStackEntry ->
+            // MainScreen(navController = navController)
+
+            HomeMainScreen(
+                navController = navController,
+                viewModel = hiltViewModel()
+            )
+        }
+
+        composable(
+            route = RemakScreen.Search.route,
+            enterTransition = { EnterTransition.None },
+            exitTransition = { ExitTransition.None },
         ) {
             // MainScreen(navController = navController)
-            HomeMainScreen()
+            SearchScreen(
+                navController = navController
+            )
+        }
+
+        composable(
+            route = RemakScreen.Tag.route,
+            enterTransition = { EnterTransition.None },
+            exitTransition = { ExitTransition.None },
+        ) {
+            // MainScreen(navController = navController)
+            TagScreen(
+                navController = navController
+            )
+        }
+
+        composable(
+            route = RemakScreen.Collection.route,
+            enterTransition = { EnterTransition.None },
+            exitTransition = { ExitTransition.None },
+        ) {
+            // MainScreen(navController = navController)
+            CollectionScreen(
+                navController = navController
+            )
+        }
+
+        composable(
+            route = RemakScreen.Profile.route,
+            enterTransition = { EnterTransition.None },
+            exitTransition = { ExitTransition.None },
+        ) {
+            // MainScreen(navController = navController)
+            ProfileScreen(
+                navController = navController
+            )
         }
 
 

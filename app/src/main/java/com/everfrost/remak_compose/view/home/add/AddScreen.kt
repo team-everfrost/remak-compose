@@ -15,6 +15,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
@@ -27,6 +29,8 @@ import com.everfrost.remak_compose.ui.theme.black1
 import com.everfrost.remak_compose.ui.theme.pretendard
 import com.everfrost.remak_compose.ui.theme.white
 import com.everfrost.remak_compose.view.RemakScreen
+import com.everfrost.remak_compose.view.common.dialog.CustomConfirmDialog
+import com.everfrost.remak_compose.view.common.dialog.CustomSelectDialog
 import com.everfrost.remak_compose.viewModel.home.add.AddTopBar
 import com.everfrost.remak_compose.viewModel.home.add.AddViewModel
 import com.everfrost.remak_compose.viewModel.home.add.UploadState
@@ -46,11 +50,26 @@ fun AddScreen(
 
     val uploadState by viewModel.uploadState.collectAsState()
 
+    val tmpDialog = remember { mutableStateOf(false) }
+
     LaunchedEffect(uploadState) {
         if (uploadState == UploadState.LOADING) {
             navController.navigate(RemakScreen.AddLoading.route)
         }
     }
+
+    when {
+        tmpDialog.value ->
+            CustomConfirmDialog(
+                onDismissRequest = {
+                    tmpDialog.value = false
+                },
+                mainTitle = "메모",
+                subTitle = "메모를 입력해주세요",
+                btnText = "확인"
+            )
+    }
+
     Scaffold(
         containerColor = white,
         topBar = {
@@ -112,7 +131,9 @@ fun AddScreen(
                 )
 
                 AddRowButton(
-                    onClick = { /*TODO*/ },
+                    onClick = {
+                        tmpDialog.value = true
+                    },
                     modifier = Modifier
                         .padding(top = 24.dp)
                         .fillMaxWidth()

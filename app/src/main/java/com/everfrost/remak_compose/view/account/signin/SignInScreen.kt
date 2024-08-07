@@ -35,7 +35,7 @@ import com.everfrost.remak_compose.ui.theme.red1
 import com.everfrost.remak_compose.ui.theme.white
 import com.everfrost.remak_compose.view.BottomNav
 import com.everfrost.remak_compose.view.account.widget.textfield.AccountTextField
-import com.everfrost.remak_compose.view.common.BackTitleAppBar
+import com.everfrost.remak_compose.view.common.appbar.BackTitleAppBar
 import com.everfrost.remak_compose.view.common.button.PrimaryButton
 import com.everfrost.remak_compose.view.tool.customHeightBasedOnWidth
 import com.everfrost.remak_compose.viewModel.account.signin.SignInVIewModel

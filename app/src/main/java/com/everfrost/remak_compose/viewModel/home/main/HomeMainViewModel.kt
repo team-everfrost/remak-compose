@@ -63,7 +63,6 @@ class HomeMainViewModel @Inject constructor(
         if (isDataEnd.value) return
         _mainListState.value = APIResponse.Loading()
         viewModelScope.launch {
-            Log.d("메인", "fetchMainList: $cursor, $docID")
             val response = mainRepository.getMainList(cursor, docID)
             if (response is APIResponse.Success) {
                 _mainListState.value = response
@@ -76,7 +75,6 @@ class HomeMainViewModel @Inject constructor(
                 docID = response.data.data.last().docId
 
                 val tmpData = _mainList.value.toMutableList()
-                val newList = mutableListOf<MainListModel.Data>()
 
                 for (data in response.data.data) {
                     data.updatedAt =
@@ -164,6 +162,19 @@ class HomeMainViewModel @Inject constructor(
 
     fun toggleEditMode() {
         _isEditMode.value = !_isEditMode.value
+        _mainList.value.forEach {
+            it.isSelected = false
+        }
+    }
+
+    fun toggleSelect(index: Int) {
+        _mainList.value = _mainList.value.toMutableList().also {
+            it[index] = it[index].copy(isSelected = !it[index].isSelected)
+        }
+        if (_mainList.value.all { !it.isSelected }) {
+            _isEditMode.value = false
+        }
+
     }
 
 

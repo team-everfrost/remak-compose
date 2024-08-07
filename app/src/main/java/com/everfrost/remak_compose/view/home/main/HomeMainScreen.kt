@@ -96,7 +96,7 @@ fun HomeMainScreen(
             .debounce(200L)
             .collect { visibleItems ->
                 val lastVisibleItem = visibleItems.lastOrNull()
-                if (lastVisibleItem != null && lastVisibleItem.index >= mainList.size - 1 && mainListState !is APIResponse.Loading && !isDataEnd) {
+                if (lastVisibleItem != null && lastVisibleItem.index >= mainList.size - 1 && mainListState !is APIResponse.Loading && !isDataEnd && !isEditMode) {
                     viewModel.fetchMainList()
                 }
             }
@@ -189,8 +189,24 @@ fun HomeMainScreen(
                                 isSelected = mainList[index].isSelected,
                                 content = mainList[index].content!!,
                                 isEditMode = isEditMode,
+                                onShortTab = {
+                                    if (isEditMode) {
+                                        viewModel.toggleSelect(index)
+                                    }
+                                },
+                                onLongTab = {
+                                    if (isEditMode) {
 
-                                )
+                                    } else {
+                                        haptics.performHapticFeedback(
+                                            HapticFeedbackType.LongPress
+                                        )
+                                        viewModel.toggleEditMode()
+                                        viewModel.toggleSelect(index)
+                                    }
+                                }
+
+                            )
 
                             "FILE" -> FileLayout(
                                 modifier = Modifier
@@ -204,7 +220,9 @@ fun HomeMainScreen(
                                 isSelected = mainList[index].isSelected,
                                 isEditMode = isEditMode,
                                 onShortTab = {
-                                    Log.d("HomeMainScreen", "onShortTab")
+                                    if (isEditMode) {
+                                        viewModel.toggleSelect(index)
+                                    }
                                 },
                                 onLongTab = {
                                     if (isEditMode) {
@@ -214,6 +232,7 @@ fun HomeMainScreen(
                                             HapticFeedbackType.LongPress
                                         )
                                         viewModel.toggleEditMode()
+                                        viewModel.toggleSelect(index)
                                     }
                                 }
 
@@ -230,9 +249,24 @@ fun HomeMainScreen(
                                 status = mainList[index].status!!,
                                 isSelected = mainList[index].isSelected,
                                 isEditMode = isEditMode,
-
                                 summary = mainList[index].summary,
-                                thumbnailUrl = mainList[index].thumbnailUrl
+                                thumbnailUrl = mainList[index].thumbnailUrl,
+                                onShortTab = {
+                                    if (isEditMode) {
+                                        viewModel.toggleSelect(index)
+                                    }
+                                },
+                                onLongTab = {
+                                    if (isEditMode) {
+
+                                    } else {
+                                        haptics.performHapticFeedback(
+                                            HapticFeedbackType.LongPress
+                                        )
+                                        viewModel.toggleEditMode()
+                                        viewModel.toggleSelect(index)
+                                    }
+                                }
                             )
 
                             "IMAGE" -> {
@@ -249,8 +283,24 @@ fun HomeMainScreen(
                                     status = mainList[index].status!!,
                                     isSelected = mainList[index].isSelected,
                                     isEditMode = isEditMode,
+                                    onShortTab = {
+                                        if (isEditMode) {
+                                            viewModel.toggleSelect(index)
+                                        }
+                                    },
+                                    onLongTab = {
+                                        if (isEditMode) {
 
-                                    )
+                                        } else {
+                                            haptics.performHapticFeedback(
+                                                HapticFeedbackType.LongPress
+                                            )
+                                            viewModel.toggleEditMode()
+                                            viewModel.toggleSelect(index)
+                                        }
+                                    }
+
+                                )
                             }
 
                             "DATE" -> Text(
@@ -269,7 +319,17 @@ fun HomeMainScreen(
 
                 }
             }
-            MainAppBar(scrollUpState = scrollUpState)
+            MainAppBar(scrollUpState = scrollUpState,
+                isEditMode = isEditMode,
+                onAddClick = {},
+                onMoreClick = {
+                    viewModel.toggleEditMode()
+                },
+                backButtonClick = {
+                    viewModel.toggleEditMode()
+                }
+
+            )
             PullRefreshIndicator(
                 refreshing = mainListState is APIResponse.Loading,
                 state = pullRefreshState,

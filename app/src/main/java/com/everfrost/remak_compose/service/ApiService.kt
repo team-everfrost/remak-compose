@@ -1,6 +1,7 @@
 package com.everfrost.remak_compose.service
 
 import com.everfrost.remak_compose.model.account.SignInModel
+import com.everfrost.remak_compose.model.home.add.CreateModel
 import com.everfrost.remak_compose.model.home.file.DownloadModel
 import com.everfrost.remak_compose.model.home.file.UploadFileModel
 import com.everfrost.remak_compose.model.home.main.MainListModel
@@ -42,10 +43,14 @@ interface ApiService {
     @GET("document/file/{docId}")
     suspend fun downloadFile(@Path("docId") docId: String): retrofit2.Response<DownloadModel.ResponseBody>
 
-    //파입 업로드
+    //파일 업로드
     @Multipart
     @POST("document/file")
     suspend fun uploadFile(@Part files: List<MultipartBody.Part>): retrofit2.Response<UploadFileModel.ResponseBody>
+
+    //웹페이지 업로드
+    @POST("document/webpage")
+    suspend fun createWebPage(@Body body: CreateModel.WebPageRequestBody): retrofit2.Response<CreateModel.WebPageResponseBody>
 
 
 }

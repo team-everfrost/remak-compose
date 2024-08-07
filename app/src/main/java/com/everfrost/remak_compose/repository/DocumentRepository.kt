@@ -2,6 +2,7 @@ package com.everfrost.remak_compose.repository
 
 import com.everfrost.remak_compose.dataSource.RemoteDataSource
 import com.everfrost.remak_compose.model.APIResponse
+import com.everfrost.remak_compose.model.home.add.CreateModel
 import com.everfrost.remak_compose.model.home.file.DownloadModel
 import com.everfrost.remak_compose.model.home.file.UploadFileModel
 import com.everfrost.remak_compose.model.home.main.MainListModel
@@ -19,6 +20,9 @@ interface DocumentRepository {
 
     //파일 업로드
     suspend fun uploadFile(files: List<MultipartBody.Part>): APIResponse<UploadFileModel.ResponseBody>
+
+    //웹페이지 업로드
+    suspend fun createWebPage(url: String): APIResponse<CreateModel.WebPageResponseBody>
 
 }
 
@@ -74,6 +78,28 @@ class DocumentRepositoryImpl(
     override suspend fun uploadFile(files: List<MultipartBody.Part>): APIResponse<UploadFileModel.ResponseBody> {
         try {
             val response = remoteDataSource.uploadFile(files)
+            return if (response.isSuccessful) {
+                APIResponse.Success(data = response.body())
+            } else {
+                APIResponse.Error(
+                    message = "message: ${
+                        response.errorBody()!!.string()
+                    }",
+                    errorCode = response.code().toString()
+                )
+            }
+        } catch (e: Exception) {
+            return APIResponse.Error(
+                message = "Sign in failed: ${e.message}",
+                errorCode = "500"
+            )
+        }
+    }
+
+    //웹페이지 업로드
+    override suspend fun createWebPage(url: String): APIResponse<CreateModel.WebPageResponseBody> {
+        try {
+            val response = remoteDataSource.createWebPage(url)
             return if (response.isSuccessful) {
                 APIResponse.Success(data = response.body())
             } else {

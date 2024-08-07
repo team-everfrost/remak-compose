@@ -11,6 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.everfrost.remak_compose.model.APIResponse
+import com.everfrost.remak_compose.model.home.add.CreateModel
 import com.everfrost.remak_compose.model.home.file.UploadFileModel
 import com.everfrost.remak_compose.repository.DocumentRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -31,8 +32,8 @@ class AddViewModel @Inject constructor(
     private val _uploadState = MutableStateFlow(UploadState.IDLE)
     val uploadState: StateFlow<UploadState> = _uploadState
 
-    private val _isActionComplete = mutableStateOf(false)
-    val isActionComplete: State<Boolean> = _isActionComplete
+    private val _isActionComplete = MutableStateFlow(false)
+    val isActionComplete: StateFlow<Boolean> = _isActionComplete
 
     private val _isFileTooLarge = MutableStateFlow(false)
     val isFileTooLarge: StateFlow<Boolean> = _isFileTooLarge
@@ -42,8 +43,61 @@ class AddViewModel @Inject constructor(
     val uploadFileResponse: StateFlow<APIResponse<UploadFileModel.ResponseBody>> =
         _uploadFileResponse
 
+    private val _linkText = MutableStateFlow("")
+    val linkText: StateFlow<String> = _linkText
+
+    private val _createWebPageState =
+        MutableStateFlow<APIResponse<CreateModel.WebPageResponseBody>>(APIResponse.Empty())
+    val createWebPageState: StateFlow<APIResponse<CreateModel.WebPageResponseBody>> =
+        _createWebPageState
+
+    fun setLinkText(value: String) {
+        _linkText.value = value
+    }
+
     fun setIsFileTooLarge(value: Boolean) {
         _isFileTooLarge.value = value
+    }
+
+    fun setIsActionComplete(value: Boolean) {
+        _isActionComplete.value = value
+    }
+
+    fun createWebPage() {
+        Log.d("AddViewModel", _linkText.value)
+        val urlList = formatWebPageUrl()
+        Log.d("AddViewModel", "createWebPage: $urlList")
+        if (urlList.isEmpty()) {
+            return
+        }
+        viewModelScope.launch {
+            for (url in urlList) {
+                _createWebPageState.value = documentRepository.createWebPage(url)
+            }
+            if (_createWebPageState.value is APIResponse.Success) {
+                _isActionComplete.value = true
+            }
+        }
+    }
+
+    private fun formatWebPageUrl(): List<String> {
+        val url = _linkText.value.trim()
+        val splitText = url.split("\\n|\\s".toRegex()) //줄바꿈, 공백으로 구분
+        val tmpList = mutableListOf<String>()
+        val urlList = mutableListOf<String>()
+        for (text in splitText) {
+            tmpList.add(text)
+        }
+        for (i in tmpList) {
+            var beforeUrl = i
+            if (!i.startsWith("http://") && !i.startsWith("https://")) {
+                beforeUrl = "https://$i"
+                urlList.add(beforeUrl)
+            } else {
+                urlList.add(beforeUrl)
+            }
+        }
+        return urlList
     }
 
 

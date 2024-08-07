@@ -1,6 +1,7 @@
 package com.everfrost.remak_compose.dataSource
 
 import com.everfrost.remak_compose.model.account.SignInModel
+import com.everfrost.remak_compose.model.home.add.CreateModel
 import com.everfrost.remak_compose.model.home.file.DownloadModel
 import com.everfrost.remak_compose.model.home.file.UploadFileModel
 import com.everfrost.remak_compose.model.home.main.MainListModel
@@ -27,6 +28,10 @@ interface RemoteDataSource {
 
     //파입 업로드
     suspend fun uploadFile(files: List<MultipartBody.Part>): Response<UploadFileModel.ResponseBody>
+
+    //웹페이지 업로드
+    suspend fun createWebPage(url: String): Response<CreateModel.WebPageResponseBody>
+
 
 }
 
@@ -69,6 +74,12 @@ class RemoteDataSourceImpl @Inject constructor(
     //파입 업로드
     override suspend fun uploadFile(files: List<MultipartBody.Part>): Response<UploadFileModel.ResponseBody> {
         return apiService.uploadFile(files)
+    }
+
+    //웹페이지 업로드
+    override suspend fun createWebPage(url: String): Response<CreateModel.WebPageResponseBody> {
+        val requestBody = CreateModel.WebPageRequestBody(" ", url = url, " ")
+        return apiService.createWebPage(requestBody)
     }
 
 }

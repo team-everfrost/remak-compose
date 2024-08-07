@@ -84,6 +84,10 @@ dependencies {
     implementation(libs.retrofit.gson)
     // dataStore
     implementation(libs.dataStore)
+    // okHttp
+    implementation(libs.okhttp)
+    // lottie
+    implementation(libs.lottie)
 
 }
 

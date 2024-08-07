@@ -13,6 +13,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry
@@ -28,6 +29,7 @@ import com.everfrost.remak_compose.view.account.onboarding.OnboardingScreen
 import com.everfrost.remak_compose.view.account.signin.SignInScreen
 import com.everfrost.remak_compose.view.collection.CollectionScreen
 import com.everfrost.remak_compose.view.home.File.FileDetailScreen
+import com.everfrost.remak_compose.view.home.add.AddLoadingScreen
 import com.everfrost.remak_compose.view.home.add.AddScreen
 import com.everfrost.remak_compose.view.home.main.HomeMainScreen
 import com.everfrost.remak_compose.view.profile.ProfileScreen
@@ -43,6 +45,7 @@ enum class RemakScreen(val route: String, val title: String, val icon: Int? = nu
     Profile("Profile", "프로필", icon = R.drawable.icon_profile),
     FileDetail("FileDetail/{docId}", "파일 상세"),
     Add("Add", "추가"),
+    AddLoading("AddLoading", "추가 중"),
 }
 
 fun NavGraphBuilder.composableWithAnimation(
@@ -191,12 +194,32 @@ fun RemakApp(
                 )
             },
             exitTransition = { fadeOut(animationSpec = tween(400)) },
-        ) {
+        ) { backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(RemakScreen.Add.route)
+            }
             AddScreen(
                 navController = navController,
-                viewModel = hiltViewModel()
+                viewModel = hiltViewModel(parentEntry)
             )
         }
+
+        composable(
+            route = RemakScreen.AddLoading.route,
+            enterTransition = {
+                EnterTransition.None
+            },
+            exitTransition = { ExitTransition.None },
+        ) { backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(RemakScreen.Add.route)
+            }
+            AddLoadingScreen(
+                navController = navController,
+                viewModel = hiltViewModel(parentEntry)
+            )
+        }
+
     }
 
 }

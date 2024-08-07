@@ -2,8 +2,10 @@ package com.everfrost.remak_compose.dataSource
 
 import com.everfrost.remak_compose.model.account.SignInModel
 import com.everfrost.remak_compose.model.home.file.DownloadModel
+import com.everfrost.remak_compose.model.home.file.UploadFileModel
 import com.everfrost.remak_compose.model.home.main.MainListModel
 import com.everfrost.remak_compose.service.ApiService
+import okhttp3.MultipartBody
 import retrofit2.Response
 import javax.inject.Inject
 
@@ -23,6 +25,8 @@ interface RemoteDataSource {
     //파일 다운로드
     suspend fun downloadFile(docId: String): Response<DownloadModel.ResponseBody>
 
+    //파입 업로드
+    suspend fun uploadFile(files: List<MultipartBody.Part>): Response<UploadFileModel.ResponseBody>
 
 }
 
@@ -60,6 +64,11 @@ class RemoteDataSourceImpl @Inject constructor(
     //파일 다운로드
     override suspend fun downloadFile(docId: String): Response<DownloadModel.ResponseBody> {
         return apiService.downloadFile(docId)
+    }
+
+    //파입 업로드
+    override suspend fun uploadFile(files: List<MultipartBody.Part>): Response<UploadFileModel.ResponseBody> {
+        return apiService.uploadFile(files)
     }
 
 }

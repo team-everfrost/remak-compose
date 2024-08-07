@@ -56,6 +56,10 @@ retrofit-gson = { group = "com.squareup.retrofit2", name = "converter-gson", ver
 # dataStore
 dataStore = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "dataStore" }
 androidx-foundation-android = { group = "androidx.compose.foundation", name = "foundation-android" }
+# okhttp
+okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version = "4.11.0" }
+# lottie
+lottie = { group = "com.airbnb.android", name = "lottie-compose", version = "6.1.0" }
 
 
 [plugins]

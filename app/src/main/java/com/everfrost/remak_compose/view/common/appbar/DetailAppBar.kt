@@ -83,7 +83,7 @@ fun DetailAppBar(
                     },
                     content = {
                         Icon(
-                            painter = painterResource(id = R.drawable.icon_tag),
+                            painter = painterResource(id = R.drawable.icon_share),
                             contentDescription = "share"
                         )
                     }

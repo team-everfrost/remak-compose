@@ -20,8 +20,12 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -30,6 +34,7 @@ import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.everfrost.remak_compose.R
+import com.everfrost.remak_compose.model.APIResponse
 import com.everfrost.remak_compose.ui.theme.bgGray2
 import com.everfrost.remak_compose.ui.theme.black1
 import com.everfrost.remak_compose.ui.theme.black3
@@ -50,6 +55,16 @@ fun FileDetailScreen(
 
 ) {
     val scrollState = rememberScrollState()
+    val getDetailDataState by viewModel.getDetailDataState.collectAsState()
+    val date by viewModel.date.collectAsState()
+    val title by viewModel.title.collectAsState()
+    val summary by viewModel.summary.collectAsState()
+    val tagList by viewModel.tagList.collectAsState()
+
+    LaunchedEffect(true) {
+        viewModel.fetchDetailData("cb0d8eb1-6b02-41a4-9332-d651ad4ed6a2")
+    }
+    val context = LocalContext.current
 
     Scaffold(
         modifier = Modifier
@@ -60,7 +75,7 @@ fun FileDetailScreen(
                 backClick = { /*TODO*/ },
                 title = "파일",
                 isShareEnable = true,
-                shareClick = { /*TODO*/ },
+                shareClick = { viewModel.shareFile(context) },
                 dropDownMenuContent = {
                     DropdownMenuItem(
                         modifier = Modifier.height(40.dp),
@@ -81,16 +96,17 @@ fun FileDetailScreen(
             )
         },
         bottomBar = {
-            PrimaryButton(
-                modifier = Modifier
-                    .padding(bottom = 16.dp)
-                    .fillMaxWidth()
-                    .height(52.dp)
-                    .padding(horizontal = 16.dp),
-                onClick = { /*TODO*/ },
-                isEnable = true,
-                text = "다운로드",
-            )
+            if (getDetailDataState is APIResponse.Success)
+                PrimaryButton(
+                    modifier = Modifier
+                        .padding(bottom = 16.dp)
+                        .fillMaxWidth()
+                        .height(52.dp)
+                        .padding(horizontal = 16.dp),
+                    onClick = { viewModel.downloadFile(context) },
+                    isEnable = true,
+                    text = "다운로드",
+                )
         }
     ) { innerPadding ->
         Box(
@@ -99,103 +115,91 @@ fun FileDetailScreen(
                 .padding(horizontal = 16.dp)
                 .fillMaxSize()
         ) {
-            Column(
-                modifier = Modifier.verticalScroll(scrollState)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(240.dp)
-                        .background(bgGray2, shape = RoundedCornerShape(12.dp))
-                        .border(
-                            width = 1.dp,
-                            color = strokeGray2,
-                            shape = RoundedCornerShape(12.dp)
-                        )
+            if (getDetailDataState is APIResponse.Success) {
+                Column(
+                    modifier = Modifier.verticalScroll(scrollState)
                 ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.icon_file_gray),
-                        contentDescription = null,
+                    Box(
                         modifier = Modifier
-                            .align(Alignment.Center)
-                            .height(96.dp)
-                    )
-                }
-                Text(
-                    text = "2023.11.22", style = TextStyle(
-                        fontSize = 13.sp,
-                        fontFamily = pretendard,
-                        color = black3,
-                        fontWeight = FontWeight.Medium
-                    ),
-                    modifier = Modifier.padding(top = 24.dp)
-                )
-                Text(
-                    text = "2023.11.22", style = TextStyle(
-                        fontSize = 20.sp,
-                        fontFamily = pretendard,
-                        color = black1,
-                        fontWeight = FontWeight.Bold
-                    ),
-                    modifier = Modifier.padding(top = 12.dp)
-                )
-
-                TagRowLayout(
-                    modifier = Modifier.padding(top = 24.dp),
-                    tags = listOf(
-                        "태그1",
-                        "태그2",
-                        "태그3",
-                        "태그4",
-                        "태그5",
-                        "태그6",
-                        "태그7",
-                        "태그8",
-                        "태그9",
-                        "태그10"
-                    ),
-                    onClick = { /*TODO*/ }
-                )
-
-                Text(
-                    text = "요약", style = TextStyle(
-                        fontSize = 18.sp,
-                        fontFamily = pretendard,
-                        color = black1,
-                        fontWeight = FontWeight.Bold
-                    ), modifier = Modifier.padding(top = 24.dp)
-                )
-
-                Box(
-                    modifier = Modifier
-                        .padding(top = 16.dp)
-                        .fillMaxWidth()
-                        .heightIn(min = 80.dp)
-                        .background(white, shape = RoundedCornerShape(12.dp))
-                        .border(
-                            width = 1.dp,
-                            color = strokeGray2,
-                            shape = RoundedCornerShape(12.dp)
+                            .fillMaxWidth()
+                            .height(240.dp)
+                            .background(bgGray2, shape = RoundedCornerShape(12.dp))
+                            .border(
+                                width = 1.dp,
+                                color = strokeGray2,
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.icon_file_gray),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .height(96.dp)
                         )
-                        .padding(horizontal = 16.dp, vertical = 20.dp)
-                ) {
+                    }
                     Text(
-                        text = "아주길고긴 요약을 써줘 아주길고긴 요약을 써줘 아주길" +
-                                "고긴 요약을 써줘 아주길고긴 요약을 써줘 " +
-                                "아주길고긴 요약을 써줘" +
-                                " 아주길고긴 요약을 써줘 아주길고긴 요약을 써줘 아주길고긴 요약을 써줘 ",
-                        style = TextStyle(
-                            fontSize = 14.sp,
+                        text = date, style = TextStyle(
+                            fontSize = 13.sp,
                             fontFamily = pretendard,
                             color = black3,
                             fontWeight = FontWeight.Medium
                         ),
-                        modifier = Modifier
+                        modifier = Modifier.padding(top = 24.dp)
                     )
-                }
-                Box(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = title, style = TextStyle(
+                            fontSize = 20.sp,
+                            fontFamily = pretendard,
+                            color = black1,
+                            fontWeight = FontWeight.Bold
+                        ),
+                        modifier = Modifier.padding(top = 12.dp)
+                    )
 
-            } // Column
+                    TagRowLayout(
+                        modifier = Modifier.padding(top = 24.dp),
+                        tags = tagList,
+                        onClick = { /*TODO*/ }
+                    )
+
+                    Text(
+                        text = "요약", style = TextStyle(
+                            fontSize = 18.sp,
+                            fontFamily = pretendard,
+                            color = black1,
+                            fontWeight = FontWeight.Bold
+                        ), modifier = Modifier.padding(top = 24.dp)
+                    )
+
+                    Box(
+                        modifier = Modifier
+                            .padding(top = 16.dp)
+                            .fillMaxWidth()
+                            .heightIn(min = 80.dp)
+                            .background(white, shape = RoundedCornerShape(12.dp))
+                            .border(
+                                width = 1.dp,
+                                color = strokeGray2,
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                            .padding(horizontal = 16.dp, vertical = 20.dp)
+                    ) {
+                        Text(
+                            text = summary,
+                            style = TextStyle(
+                                fontSize = 14.sp,
+                                fontFamily = pretendard,
+                                color = black3,
+                                fontWeight = FontWeight.Medium
+                            ),
+                            modifier = Modifier
+                        )
+                    }
+                    Box(modifier = Modifier.height(16.dp))
+
+                } // Column
+            }
         }
 
     }

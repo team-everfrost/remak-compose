@@ -111,6 +111,9 @@ fun HomeMainScreen(
     BackHandler {
         if (isEditMode) {
             viewModel.toggleEditMode()
+        } else {
+            navController.popBackStack()
+
         }
     }
     Scaffold(
@@ -222,6 +225,8 @@ fun HomeMainScreen(
                                 onShortTab = {
                                     if (isEditMode) {
                                         viewModel.toggleSelect(index)
+                                    } else {
+                                        navController.navigate("FileDetail/${mainList[index].docId}")
                                     }
                                 },
                                 onLongTab = {

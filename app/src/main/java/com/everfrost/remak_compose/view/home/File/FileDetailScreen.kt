@@ -51,7 +51,7 @@ import com.everfrost.remak_compose.viewModel.home.file.FileDetailViewModel
 fun FileDetailScreen(
     navController: NavController,
     viewModel: FileDetailViewModel,
-    docIdx: String? = "c35a8041-43f3-47ab-9581-1d1ad38751f2"
+    docIdx: String?
 
 ) {
     val scrollState = rememberScrollState()
@@ -62,7 +62,7 @@ fun FileDetailScreen(
     val tagList by viewModel.tagList.collectAsState()
 
     LaunchedEffect(true) {
-        viewModel.fetchDetailData("cb0d8eb1-6b02-41a4-9332-d651ad4ed6a2")
+        viewModel.fetchDetailData(docIdx!!)
     }
     val context = LocalContext.current
 

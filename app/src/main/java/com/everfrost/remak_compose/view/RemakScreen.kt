@@ -8,6 +8,8 @@ import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,6 +28,7 @@ import com.everfrost.remak_compose.view.account.onboarding.OnboardingScreen
 import com.everfrost.remak_compose.view.account.signin.SignInScreen
 import com.everfrost.remak_compose.view.collection.CollectionScreen
 import com.everfrost.remak_compose.view.home.File.FileDetailScreen
+import com.everfrost.remak_compose.view.home.add.AddScreen
 import com.everfrost.remak_compose.view.home.main.HomeMainScreen
 import com.everfrost.remak_compose.view.profile.ProfileScreen
 
@@ -39,6 +42,7 @@ enum class RemakScreen(val route: String, val title: String, val icon: Int? = nu
     Collection("Collection", "컬렉션", icon = R.drawable.icon_collection),
     Profile("Profile", "프로필", icon = R.drawable.icon_profile),
     FileDetail("FileDetail/{docId}", "파일 상세"),
+    Add("Add", "추가"),
 }
 
 fun NavGraphBuilder.composableWithAnimation(
@@ -106,7 +110,7 @@ fun RemakApp(
         composable(
             route = RemakScreen.Main.route,
             enterTransition = { EnterTransition.None },
-            exitTransition = { ExitTransition.None },
+            exitTransition = { ExitTransition.KeepUntilTransitionsFinished },
         ) { navBackStackEntry ->
             HomeMainScreen(
                 navController = navController,
@@ -162,7 +166,13 @@ fun RemakApp(
             route = RemakScreen.FileDetail.route,
             arguments = listOf(
                 navArgument("docId") { type = NavType.StringType }
-            )
+            ),
+            enterTransition = {
+                fadeIn(animationSpec = tween(400))
+            },
+            exitTransition = {
+                fadeOut(animationSpec = tween(400))
+            },
         ) { backStackEntry ->
             val docIdx = backStackEntry.arguments?.getString("docId")
             FileDetailScreen(
@@ -172,7 +182,21 @@ fun RemakApp(
             )
         }
 
-
+        composable(
+            route = RemakScreen.Add.route,
+            enterTransition = {
+                fadeIn(
+                    animationSpec =
+                    tween(400)
+                )
+            },
+            exitTransition = { fadeOut(animationSpec = tween(400)) },
+        ) {
+            AddScreen(
+                navController = navController,
+                viewModel = hiltViewModel()
+            )
+        }
     }
 
 }

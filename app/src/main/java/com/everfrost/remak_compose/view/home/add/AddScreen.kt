@@ -58,17 +58,7 @@ fun AddScreen(
         }
     }
 
-    when {
-        tmpDialog.value ->
-            CustomConfirmDialog(
-                onDismissRequest = {
-                    tmpDialog.value = false
-                },
-                mainTitle = "메모",
-                subTitle = "메모를 입력해주세요",
-                btnText = "확인"
-            )
-    }
+
 
     Scaffold(
         containerColor = white,

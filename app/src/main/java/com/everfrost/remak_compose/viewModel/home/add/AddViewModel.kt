@@ -34,13 +34,17 @@ class AddViewModel @Inject constructor(
     private val _isActionComplete = mutableStateOf(false)
     val isActionComplete: State<Boolean> = _isActionComplete
 
-    private val _isFileTooLarge = mutableStateOf(false)
-    val isFileTooLarge: State<Boolean> = _isFileTooLarge
+    private val _isFileTooLarge = MutableStateFlow(false)
+    val isFileTooLarge: StateFlow<Boolean> = _isFileTooLarge
 
     private val _uploadFileResponse =
         MutableStateFlow<APIResponse<UploadFileModel.ResponseBody>>(APIResponse.Empty())
     val uploadFileResponse: StateFlow<APIResponse<UploadFileModel.ResponseBody>> =
         _uploadFileResponse
+
+    fun setIsFileTooLarge(value: Boolean) {
+        _isFileTooLarge.value = value
+    }
 
 
     private fun uploadFile(fileList: List<MultipartBody.Part>) {
@@ -51,10 +55,9 @@ class AddViewModel @Inject constructor(
                 _uploadState.value = UploadState.SUCCESS
             } else {
                 _uploadState.value = UploadState.FAIL
-                Log.d(
-                    "AddViewModel",
-                    "uploadFile: ${(_uploadFileResponse.value as APIResponse.Error).message}"
-                )
+                if (_uploadFileResponse.value.errorCode == "413") {
+                    _isFileTooLarge.value = true
+                }
             }
         }
 

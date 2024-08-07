@@ -71,7 +71,9 @@ fun MainAppBar(
                 if (!isEditMode) {
                     Row {
                         IconButton(
-                            onClick = { /*TODO*/ },
+                            onClick = {
+                                onAddClick()
+                            },
                             modifier = Modifier.size(24.dp)
                         ) {
                             Icon(

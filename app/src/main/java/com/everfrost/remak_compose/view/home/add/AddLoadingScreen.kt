@@ -31,7 +31,9 @@ import com.everfrost.remak_compose.R
 import com.everfrost.remak_compose.ui.theme.black2
 import com.everfrost.remak_compose.ui.theme.pretendard
 import com.everfrost.remak_compose.ui.theme.white
+import com.everfrost.remak_compose.view.RemakScreen
 import com.everfrost.remak_compose.view.common.button.PrimaryButton
+import com.everfrost.remak_compose.view.common.dialog.CustomConfirmDialog
 import com.everfrost.remak_compose.viewModel.home.add.AddViewModel
 import com.everfrost.remak_compose.viewModel.home.add.UploadState
 import com.skydoves.landscapist.glide.GlideImage
@@ -51,6 +53,19 @@ fun AddLoadingScreen(
         iterations = 1,
         isPlaying = uploadState == UploadState.SUCCESS
     )
+    val isFileTooLarge by viewModel.isFileTooLarge.collectAsState()
+
+    when {
+        isFileTooLarge ->
+            CustomConfirmDialog(
+                onDismissRequest = {
+                    viewModel.setIsFileTooLarge(false)
+                },
+                mainTitle = "파일이 너무 큽니다",
+                subTitle = "파일 크기는 10MB 이하로 제한되어 있습니다",
+                btnText = "확인"
+            )
+    }
 
 
     Scaffold(
@@ -66,7 +81,18 @@ fun AddLoadingScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(52.dp),
-                    onClick = { /*TODO*/ },
+                    onClick = {
+
+                        navController.navigate(RemakScreen.Main.route) {
+                            popUpTo(navController.graph.id) {
+                                inclusive = true
+                            }
+                        }
+                        navController.previousBackStackEntry?.savedStateHandle?.set(
+                            "isUpdate",
+                            true
+                        )
+                    },
                     isEnable = true,
                     text = "확인"
                 )

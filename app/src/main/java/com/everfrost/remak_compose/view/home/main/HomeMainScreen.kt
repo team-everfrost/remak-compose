@@ -53,6 +53,7 @@ import com.everfrost.remak_compose.ui.theme.pretendard
 import com.everfrost.remak_compose.ui.theme.textBlack3
 import com.everfrost.remak_compose.ui.theme.white
 import com.everfrost.remak_compose.view.BottomNav
+import com.everfrost.remak_compose.view.RemakScreen
 import com.everfrost.remak_compose.view.common.layout.FileLayout
 import com.everfrost.remak_compose.view.common.layout.ImageLayout
 import com.everfrost.remak_compose.view.common.layout.LinkLayout
@@ -89,6 +90,18 @@ fun HomeMainScreen(
         LaunchedEffect(Unit) {
             viewModel.fetchMainList()
         }
+    }
+
+    val resultState = remember {
+        navController.currentBackStackEntry?.savedStateHandle?.getLiveData<Boolean>("isUpdate")
+    }
+
+    LaunchedEffect(resultState) {
+        Log.d("HomeMainScreen", "resultState: ${resultState?.value}")
+        if (resultState?.value == true) {
+            Log.d("HomeMainScreen", "resultState: ${resultState?.value}")
+        }
+
     }
 
     LaunchedEffect(scrollState, viewModel.isDataEnd) {
@@ -284,7 +297,7 @@ fun HomeMainScreen(
                                     title = mainList[index].title!!,
                                     date = mainList[index].updatedAt!!,
                                     thumbnailUrl = mainList[index].thumbnailUrl,
-                                    summary = mainList[index].summary!!,
+                                    summary = mainList[index].summary ?: "",
                                     status = mainList[index].status!!,
                                     isSelected = mainList[index].isSelected,
                                     isEditMode = isEditMode,
@@ -326,7 +339,9 @@ fun HomeMainScreen(
             }
             MainAppBar(scrollUpState = scrollUpState,
                 isEditMode = isEditMode,
-                onAddClick = {},
+                onAddClick = {
+                    navController.navigate(RemakScreen.Add.route)
+                },
                 onMoreClick = {
                     viewModel.toggleEditMode()
                 },

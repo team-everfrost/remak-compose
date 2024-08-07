@@ -29,7 +29,7 @@ class MainActivity : ComponentActivity() {
             Remak_composeTheme {
                 Surface(
                 ) {
-                    RemakApp(startDestination = RemakScreen.Add.route)
+                    RemakApp(startDestination = RemakScreen.Main.route)
                 }
             }
         }

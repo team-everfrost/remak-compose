@@ -55,7 +55,6 @@ fun FileLayout(
     onShortTab: () -> Unit,
     onLongTab: () -> Unit
 ) {
-    val coroutineScope = rememberCoroutineScope()
     Box(
         modifier = modifier
             .shadow(
@@ -80,10 +79,14 @@ fun FileLayout(
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             if (isEditMode) {
-                Checkbox(
-                    checked = false,
-                    onCheckedChange = {},
-                    modifier = Modifier.align(Alignment.CenterVertically)
+                Image(
+                    painter = if (isSelected) painterResource(id = R.drawable.icon_selected) else painterResource(
+                        id = R.drawable.icon_unselected
+                    ),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                        .padding(end = 8.dp)
                 )
             }
             Column(

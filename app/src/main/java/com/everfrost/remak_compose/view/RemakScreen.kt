@@ -32,6 +32,7 @@ import com.everfrost.remak_compose.view.home.File.FileDetailScreen
 import com.everfrost.remak_compose.view.home.add.AddLoadingScreen
 import com.everfrost.remak_compose.view.home.add.AddScreen
 import com.everfrost.remak_compose.view.home.add.LinkAddScreen
+import com.everfrost.remak_compose.view.home.add.MemoAddScreen
 import com.everfrost.remak_compose.view.home.main.HomeMainScreen
 import com.everfrost.remak_compose.view.profile.ProfileScreen
 
@@ -48,6 +49,7 @@ enum class RemakScreen(val route: String, val title: String, val icon: Int? = nu
     Add("Add", "추가"),
     AddLoading("AddLoading", "추가 중"),
     LinkAdd("LinkAdd", "링크 추가"),
+    MemoAdd("MemoAdd", "메모 추가"),
 }
 
 fun NavGraphBuilder.composableWithAnimation(
@@ -224,6 +226,13 @@ fun RemakApp(
 
         composableWithAnimation(RemakScreen.LinkAdd.route) {
             LinkAddScreen(
+                navController = navController,
+                viewModel = hiltViewModel()
+            )
+        }
+
+        composableWithAnimation(RemakScreen.MemoAdd.route) {
+            MemoAddScreen(
                 navController = navController,
                 viewModel = hiltViewModel()
             )

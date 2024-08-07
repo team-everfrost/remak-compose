@@ -32,6 +32,9 @@ interface RemoteDataSource {
     //웹페이지 업로드
     suspend fun createWebPage(url: String): Response<CreateModel.WebPageResponseBody>
 
+    //메모 업로드
+    suspend fun createMemo(body: CreateModel.MemoRequestBody): Response<CreateModel.MemoResponseBody>
+
 
 }
 
@@ -80,6 +83,11 @@ class RemoteDataSourceImpl @Inject constructor(
     override suspend fun createWebPage(url: String): Response<CreateModel.WebPageResponseBody> {
         val requestBody = CreateModel.WebPageRequestBody(" ", url = url, " ")
         return apiService.createWebPage(requestBody)
+    }
+
+    //메모 업로드
+    override suspend fun createMemo(body: CreateModel.MemoRequestBody): Response<CreateModel.MemoResponseBody> {
+        return apiService.createMemo(body)
     }
 
 }

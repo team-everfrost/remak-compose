@@ -46,10 +46,17 @@ class AddViewModel @Inject constructor(
     private val _linkText = MutableStateFlow("")
     val linkText: StateFlow<String> = _linkText
 
+    private val _memoText = MutableStateFlow("")
+    val memoText: StateFlow<String> = _memoText
+
     private val _createWebPageState =
         MutableStateFlow<APIResponse<CreateModel.WebPageResponseBody>>(APIResponse.Empty())
     val createWebPageState: StateFlow<APIResponse<CreateModel.WebPageResponseBody>> =
         _createWebPageState
+
+    private val _addMemoState =
+        MutableStateFlow<APIResponse<CreateModel.MemoResponseBody>>(APIResponse.Empty())
+    val addMemoState: StateFlow<APIResponse<CreateModel.MemoResponseBody>> = _addMemoState
 
     fun setLinkText(value: String) {
         _linkText.value = value
@@ -61,6 +68,20 @@ class AddViewModel @Inject constructor(
 
     fun setIsActionComplete(value: Boolean) {
         _isActionComplete.value = value
+    }
+
+    fun setMemoText(value: String) {
+        _memoText.value = value
+    }
+
+    fun addMemo() {
+        viewModelScope.launch {
+            _addMemoState.value =
+                documentRepository.createMemo(CreateModel.MemoRequestBody(_memoText.value))
+            if (_addMemoState.value is APIResponse.Success) {
+                _isActionComplete.value = true
+            }
+        }
     }
 
     fun createWebPage() {

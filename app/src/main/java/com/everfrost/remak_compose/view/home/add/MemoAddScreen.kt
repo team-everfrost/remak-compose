@@ -32,15 +32,15 @@ import com.everfrost.remak_compose.viewModel.home.add.AddTopBar
 import com.everfrost.remak_compose.viewModel.home.add.AddViewModel
 
 @Composable
-fun LinkAddScreen(
+fun MemoAddScreen(
     navController: NavController,
     viewModel: AddViewModel
 ) {
-    val linkText by viewModel.linkText.collectAsState()
+    val memoText by viewModel.memoText.collectAsState()
     val isActionComplete by viewModel.isActionComplete.collectAsState()
 
     when {
-        isActionComplete ->
+        isActionComplete -> {
             CustomConfirmDialog(
                 onDismissRequest = {
                     viewModel.setIsActionComplete(false)
@@ -50,10 +50,11 @@ fun LinkAddScreen(
                         }
                     }
                 },
-                mainTitle = "링크 추가",
-                subTitle = "링크가 추가되었습니다.",
+                mainTitle = "메모가 추가되었습니다",
+                subTitle = "",
                 btnText = "확인",
             )
+        }
     }
     Scaffold(
         containerColor = white,
@@ -69,8 +70,8 @@ fun LinkAddScreen(
                     .padding(horizontal = 16.dp)
                     .fillMaxWidth()
                     .height(52.dp),
-                onClick = { viewModel.createWebPage() },
-                isEnable = linkText.isNotEmpty(),
+                onClick = { viewModel.addMemo() },
+                isEnable = memoText.isNotEmpty(),
                 text = "추가하기"
             )
         }
@@ -86,7 +87,7 @@ fun LinkAddScreen(
                     .padding(horizontal = 16.dp)
             ) {
                 Text(
-                    text = "링크 추가하기", style = TextStyle(
+                    text = "메모 추가하기", style = TextStyle(
                         fontSize = 24.sp,
                         fontFamily = pretendard,
                         fontWeight = FontWeight.Bold,
@@ -94,7 +95,7 @@ fun LinkAddScreen(
                     )
                 )
                 Text(
-                    text = "엔터 또는 공백으로 구분하여 여러 링크를 추가하세요", style = TextStyle(
+                    text = "메모하고싶은 내용을 작성하세요", style = TextStyle(
                         fontSize = 14.sp,
                         fontFamily = pretendard,
                         fontWeight = FontWeight.Normal,
@@ -104,9 +105,9 @@ fun LinkAddScreen(
                 )
 
                 RoundGrayTextField(
-                    value = linkText,
-                    onValueChange = { viewModel.setLinkText(it) },
-                    placeholder = "예시: www.naver.com www.google.com...",
+                    value = memoText,
+                    onValueChange = { viewModel.setMemoText(it) },
+                    placeholder = "메모를 등록해보세요",
                     keyboardOptions = KeyboardOptions(),
                     modifier = Modifier
                         .padding(top = 24.dp)
@@ -118,6 +119,7 @@ fun LinkAddScreen(
             }
 
         }
+
     }
 
 }

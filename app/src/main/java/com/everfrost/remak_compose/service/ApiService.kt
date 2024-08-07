@@ -52,5 +52,10 @@ interface ApiService {
     @POST("document/webpage")
     suspend fun createWebPage(@Body body: CreateModel.WebPageRequestBody): retrofit2.Response<CreateModel.WebPageResponseBody>
 
+    //메모 업로드
+    //메모 생성
+    @POST("document/memo")
+    suspend fun createMemo(@Body body: CreateModel.MemoRequestBody): retrofit2.Response<CreateModel.MemoResponseBody>
+
 
 }

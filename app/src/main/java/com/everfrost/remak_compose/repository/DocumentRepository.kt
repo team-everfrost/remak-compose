@@ -24,6 +24,9 @@ interface DocumentRepository {
     //웹페이지 업로드
     suspend fun createWebPage(url: String): APIResponse<CreateModel.WebPageResponseBody>
 
+    //메모 업로드
+    suspend fun createMemo(body: CreateModel.MemoRequestBody): APIResponse<CreateModel.MemoResponseBody>
+
 }
 
 class DocumentRepositoryImpl(
@@ -100,6 +103,28 @@ class DocumentRepositoryImpl(
     override suspend fun createWebPage(url: String): APIResponse<CreateModel.WebPageResponseBody> {
         try {
             val response = remoteDataSource.createWebPage(url)
+            return if (response.isSuccessful) {
+                APIResponse.Success(data = response.body())
+            } else {
+                APIResponse.Error(
+                    message = "message: ${
+                        response.errorBody()!!.string()
+                    }",
+                    errorCode = response.code().toString()
+                )
+            }
+        } catch (e: Exception) {
+            return APIResponse.Error(
+                message = "Sign in failed: ${e.message}",
+                errorCode = "500"
+            )
+        }
+    }
+
+    //메모 업로드
+    override suspend fun createMemo(body: CreateModel.MemoRequestBody): APIResponse<CreateModel.MemoResponseBody> {
+        try {
+            val response = remoteDataSource.createMemo(body)
             return if (response.isSuccessful) {
                 APIResponse.Success(data = response.body())
             } else {

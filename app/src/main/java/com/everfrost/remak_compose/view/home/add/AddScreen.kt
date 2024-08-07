@@ -58,8 +58,6 @@ fun AddScreen(
         }
     }
 
-
-
     Scaffold(
         containerColor = white,
         topBar = {
@@ -88,7 +86,7 @@ fun AddScreen(
                 )
 
                 AddRowButton(
-                    onClick = { navController.navigate(RemakScreen.AddLoading.route) },
+                    onClick = { navController.navigate(RemakScreen.LinkAdd.route) },
                     modifier = Modifier
                         .padding(top = 24.dp)
                         .fillMaxWidth()

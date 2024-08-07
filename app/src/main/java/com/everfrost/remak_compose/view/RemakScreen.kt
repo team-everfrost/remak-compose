@@ -15,14 +15,17 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.everfrost.remak_compose.R
 import com.everfrost.remak_compose.view.account.onboarding.OnboardingScreen
 import com.everfrost.remak_compose.view.account.signin.SignInScreen
 import com.everfrost.remak_compose.view.collection.CollectionScreen
+import com.everfrost.remak_compose.view.home.File.FileDetailScreen
 import com.everfrost.remak_compose.view.home.main.HomeMainScreen
 import com.everfrost.remak_compose.view.profile.ProfileScreen
 
@@ -35,6 +38,7 @@ enum class RemakScreen(val route: String, val title: String, val icon: Int? = nu
     Tag("Tag", "태그", icon = R.drawable.icon_tag),
     Collection("Collection", "컬렉션", icon = R.drawable.icon_collection),
     Profile("Profile", "프로필", icon = R.drawable.icon_profile),
+    FileDetail("FileDetail/{docId}", "파일 상세"),
 }
 
 fun NavGraphBuilder.composableWithAnimation(
@@ -104,8 +108,6 @@ fun RemakApp(
             enterTransition = { EnterTransition.None },
             exitTransition = { ExitTransition.None },
         ) { navBackStackEntry ->
-            // MainScreen(navController = navController)
-
             HomeMainScreen(
                 navController = navController,
                 viewModel = hiltViewModel()
@@ -153,6 +155,20 @@ fun RemakApp(
             // MainScreen(navController = navController)
             ProfileScreen(
                 navController = navController
+            )
+        }
+
+        composable(
+            route = RemakScreen.FileDetail.route,
+            arguments = listOf(
+                navArgument("docId") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val docIdx = backStackEntry.arguments?.getString("docId")
+            FileDetailScreen(
+                navController = navController,
+                viewModel = hiltViewModel(),
+                docIdx = docIdx
             )
         }
 

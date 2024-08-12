@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.Surface
 import com.everfrost.remak_compose.ui.theme.Remak_composeTheme
+import com.everfrost.remak_compose.ui.theme.white
 import com.everfrost.remak_compose.view.RemakApp
 import com.everfrost.remak_compose.view.RemakScreen
 import dagger.hilt.android.AndroidEntryPoint
@@ -28,8 +29,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             Remak_composeTheme {
                 Surface(
+                    color = white
                 ) {
-                    RemakApp(startDestination = RemakScreen.MemoAdd.route)
+                    RemakApp(startDestination = RemakScreen.LinkDetail.route)
                 }
             }
         }

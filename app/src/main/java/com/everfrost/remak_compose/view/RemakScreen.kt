@@ -2,7 +2,6 @@ package com.everfrost.remak_compose.view
 
 import SearchScreen
 import TagScreen
-import android.util.Log
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.EnterTransition
@@ -12,7 +11,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NamedNavArgument
@@ -28,11 +26,12 @@ import com.everfrost.remak_compose.R
 import com.everfrost.remak_compose.view.account.onboarding.OnboardingScreen
 import com.everfrost.remak_compose.view.account.signin.SignInScreen
 import com.everfrost.remak_compose.view.collection.CollectionScreen
-import com.everfrost.remak_compose.view.home.File.FileDetailScreen
 import com.everfrost.remak_compose.view.home.add.AddLoadingScreen
 import com.everfrost.remak_compose.view.home.add.AddScreen
 import com.everfrost.remak_compose.view.home.add.LinkAddScreen
 import com.everfrost.remak_compose.view.home.add.MemoAddScreen
+import com.everfrost.remak_compose.view.home.files.FileDetailScreen
+import com.everfrost.remak_compose.view.home.link.LinkDetailScreen
 import com.everfrost.remak_compose.view.home.main.HomeMainScreen
 import com.everfrost.remak_compose.view.profile.ProfileScreen
 
@@ -45,6 +44,7 @@ enum class RemakScreen(val route: String, val title: String, val icon: Int? = nu
     Tag("Tag", "태그", icon = R.drawable.icon_tag),
     Collection("Collection", "컬렉션", icon = R.drawable.icon_collection),
     Profile("Profile", "프로필", icon = R.drawable.icon_profile),
+    LinkDetail("LinkDetail/{docId}", "링크 상세"),
     FileDetail("FileDetail/{docId}", "파일 상세"),
     Add("Add", "추가"),
     AddLoading("AddLoading", "추가 중"),
@@ -117,7 +117,7 @@ fun RemakApp(
         composable(
             route = RemakScreen.Main.route,
             enterTransition = { EnterTransition.None },
-            exitTransition = { ExitTransition.KeepUntilTransitionsFinished },
+            exitTransition = { ExitTransition.KeepUntilTransitionsFinished }, // 화면이 변경완료될 때까지 기존 화면 유지
         ) { navBackStackEntry ->
             HomeMainScreen(
                 navController = navController,
@@ -170,6 +170,27 @@ fun RemakApp(
         }
 
         composable(
+            route = RemakScreen.LinkDetail.route,
+            arguments = listOf(
+                navArgument("docId") { type = NavType.StringType }
+            ),
+            enterTransition = {
+                fadeIn(animationSpec = tween(400))
+            },
+            exitTransition = {
+                fadeOut(animationSpec = tween(400))
+            },
+        ) { backStackEntry ->
+            val docIdx = backStackEntry.arguments?.getString("docId")
+            LinkDetailScreen(
+                navController = navController,
+                viewModel = hiltViewModel(),
+//                docIdx = docIdx
+            )
+        }
+
+
+        composable(
             route = RemakScreen.FileDetail.route,
             arguments = listOf(
                 navArgument("docId") { type = NavType.StringType }
@@ -197,7 +218,10 @@ fun RemakApp(
                     tween(400)
                 )
             },
-            exitTransition = { fadeOut(animationSpec = tween(400)) },
+//            exitTransition = { fadeOut(animationSpec = tween(400)) },
+            exitTransition = { ExitTransition.KeepUntilTransitionsFinished }, // 화면이 변경완료될 때까지 기존 화면 유지
+
+
         ) { backStackEntry ->
             val parentEntry = remember(backStackEntry) {
                 navController.getBackStackEntry(RemakScreen.Add.route)
@@ -237,6 +261,7 @@ fun RemakApp(
                 viewModel = hiltViewModel()
             )
         }
+
 
     }
 

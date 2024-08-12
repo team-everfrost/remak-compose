@@ -63,7 +63,7 @@ fun TagBox(
 ) {
     Box(
         modifier = Modifier
-            .height(30.dp)
+            .height(35.dp)
             .background(white)
             .border(1.dp, strokeGray2, shape = RoundedCornerShape(6.dp))
             .padding(horizontal = 12.dp)

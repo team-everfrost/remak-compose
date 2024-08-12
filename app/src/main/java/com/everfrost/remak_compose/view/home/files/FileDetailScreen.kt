@@ -1,12 +1,10 @@
-package com.everfrost.remak_compose.view.home.File
+package com.everfrost.remak_compose.view.home.files
 
-import android.graphics.Paint.Align
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -30,7 +28,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.everfrost.remak_compose.R
@@ -43,9 +40,8 @@ import com.everfrost.remak_compose.ui.theme.strokeGray2
 import com.everfrost.remak_compose.ui.theme.white
 import com.everfrost.remak_compose.view.common.appbar.DetailAppBar
 import com.everfrost.remak_compose.view.common.button.PrimaryButton
-import com.everfrost.remak_compose.view.common.layout.TagBox
 import com.everfrost.remak_compose.view.common.layout.TagRowLayout
-import com.everfrost.remak_compose.viewModel.home.file.FileDetailViewModel
+import com.everfrost.remak_compose.viewModel.home.files.FileDetailViewModel
 
 @Composable
 fun FileDetailScreen(

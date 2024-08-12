@@ -60,6 +60,7 @@ fun AddLoadingScreen(
             CustomConfirmDialog(
                 onDismissRequest = {
                     viewModel.setIsFileTooLarge(false)
+                    navController.popBackStack()
                 },
                 mainTitle = "파일이 너무 큽니다",
                 subTitle = "파일 크기는 10MB 이하로 제한되어 있습니다",

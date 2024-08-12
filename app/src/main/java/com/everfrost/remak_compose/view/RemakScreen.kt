@@ -149,7 +149,8 @@ fun RemakApp(
         ) {
             // MainScreen(navController = navController)
             TagScreen(
-                navController = navController
+                navController = navController,
+                viewModel = hiltViewModel()
             )
         }
 

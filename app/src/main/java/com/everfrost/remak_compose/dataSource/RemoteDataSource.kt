@@ -6,6 +6,7 @@ import com.everfrost.remak_compose.model.home.detail.UpdateModel
 import com.everfrost.remak_compose.model.home.file.DownloadModel
 import com.everfrost.remak_compose.model.home.file.UploadFileModel
 import com.everfrost.remak_compose.model.home.main.MainListModel
+import com.everfrost.remak_compose.model.tag.TagListModel
 import com.everfrost.remak_compose.service.ApiService
 import okhttp3.MultipartBody
 import retrofit2.Response
@@ -41,6 +42,13 @@ interface RemoteDataSource {
         docId: String,
         body: UpdateModel.MemoRequestBody
     ): Response<UpdateModel.MemoResponseBody>
+
+    //tag--------------------------------------------------------------------------------------------
+    //태그 리스트
+    suspend fun getTagList(
+        offset: Int?,
+        query: String?
+    ): Response<TagListModel.Response>
 
 
 }
@@ -103,6 +111,12 @@ class RemoteDataSourceImpl @Inject constructor(
         body: UpdateModel.MemoRequestBody
     ): Response<UpdateModel.MemoResponseBody> {
         return apiService.updateMemo(docId, body)
+    }
+
+    //tag--------------------------------------------------------------------------------------------
+    //태그 리스트
+    override suspend fun getTagList(offset: Int?, query: String?): Response<TagListModel.Response> {
+        return apiService.getTagListData(limit = 20, offset, query = query)
     }
 
 }

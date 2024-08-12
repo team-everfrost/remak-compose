@@ -6,6 +6,7 @@ import com.everfrost.remak_compose.model.home.detail.UpdateModel
 import com.everfrost.remak_compose.model.home.file.DownloadModel
 import com.everfrost.remak_compose.model.home.file.UploadFileModel
 import com.everfrost.remak_compose.model.home.main.MainListModel
+import com.everfrost.remak_compose.model.tag.TagListModel
 import okhttp3.MultipartBody
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -65,6 +66,15 @@ interface ApiService {
         @Path("docId") docId: String,
         @Body body: UpdateModel.MemoRequestBody
     ): retrofit2.Response<UpdateModel.MemoResponseBody>
+
+    //tag ---------------------------------------------------------
+    //태그 리스트
+    @GET("tag")
+    suspend fun getTagListData(
+        @Query("limit") limit: Int? = 20,
+        @Query("offset") offset: Int?,
+        @Query("query") query: String?
+    ): retrofit2.Response<TagListModel.Response>
 
 
 }

@@ -1,4 +1,4 @@
-package com.everfrost.remak_compose.viewModel.home.files
+package com.everfrost.remak_compose.viewModel.home.detail.image
 
 import android.app.DownloadManager
 import android.content.Context
@@ -27,8 +27,9 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
+
 @HiltViewModel
-class FileDetailViewModel @Inject constructor(
+class ImageDetailViewModel @Inject constructor(
     private val documentRepository: DocumentRepository
 ) : ViewModel() {
 
@@ -56,13 +57,14 @@ class FileDetailViewModel @Inject constructor(
     val summary: StateFlow<String> = _summary
     private val _isFileShareEnabled = MutableStateFlow(false)
     val isFileShareEnabled: StateFlow<Boolean> = _isFileShareEnabled
+    private val _thumbnailUrl = MutableStateFlow("")
+    val thumbnailUrl: StateFlow<String> = _thumbnailUrl
 
     fun fetchDetailData(docId: String) {
         viewModelScope.launch {
             _getDetailDataState.value = documentRepository.getDetailData(docId)
 
             if (_getDetailDataState.value is APIResponse.Success) {
-                Log.d("FileDetailViewModel", _getDetailDataState.value.data!!.data.toString())
                 val data = (_getDetailDataState.value as APIResponse.Success).data!!.data
                 val tmpTagList = mutableListOf<String>()
                 data.tags.forEach {
@@ -72,8 +74,8 @@ class FileDetailViewModel @Inject constructor(
                 _title.value = data.title!!
                 _tagList.value = tmpTagList
                 _summary.value = formatSummary(data.summary ?: "")
+                _thumbnailUrl.value = data.thumbnailUrl ?: ""
             } else {
-                Log.d("FileDetailViewModel", _getDetailDataState.value.message.toString())
             }
         }
     }
@@ -85,7 +87,12 @@ class FileDetailViewModel @Inject constructor(
     }
 
     private fun formatSummary(summary: String): String { //첫줄 제거
-        return summary.split("\n")[0]
+        val lines = summary.split("\n")
+        if (lines.size > 1) {
+            return lines.subList(1, lines.size).joinToString("\n")
+        } else {
+            return summary
+        }
     }
 
     fun downloadFile(context: Context) {
@@ -122,20 +129,21 @@ class FileDetailViewModel @Inject constructor(
             documentRepository.downloadFile(_getDetailDataState.value.data!!.data.docId!!)
         if (_shareFileState.value is APIResponse.Success) {
             val url = _shareFileState.value.data!!.data
-            downloadAndShareFile(context, url!!, title.value)
+            downloadAndShareImage(context, url!!, title.value)
         }
 
 
     }
 
-    private suspend fun downloadAndShareFile(
+
+    suspend fun downloadAndShareImage(
         context: Context,
-        fileUrl: String,
+        imageUrl: String,
         fileName: String
     ) {
         withContext(Dispatchers.IO) {
             try {
-                val url = URL(fileUrl)
+                val url = URL(imageUrl)
                 val connection = url.openConnection()
                 connection.doInput = true
                 connection.connect()
@@ -144,24 +152,29 @@ class FileDetailViewModel @Inject constructor(
                 val uri = saveImageToInternalStorage(context, fileName, inputStream)
                 withContext(Dispatchers.Main) {
                     _isFileShareEnabled.value = true
-                    shareFileUri(context, uri, fileName)
+                    shareImageUri(context, uri, fileName)
                 }
             } catch (e: Exception) {
-                Log.d("FileDetailViewModel", e.toString())
             }
-
         }
     }
 
-    private fun shareFileUri(context: Context, uri: Uri, fileName: String) {
+    private fun shareImageUri(context: Context, uri: Uri, fileName: String) {
         val shareIntent = Intent().apply {
             action = Intent.ACTION_SEND
             putExtra(Intent.EXTRA_STREAM, uri)
             type = "image/*"
             flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
         }
+        // Explicitly grant URI permission to the target package
+        val resInfoList = context.packageManager.queryIntentActivities(shareIntent, 0)
+        for (resolveInfo in resInfoList) {
+            val packageName = resolveInfo.activityInfo.packageName
+            context.grantUriPermission(packageName, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+
         context.startActivity(
-            Intent.createChooser(shareIntent, fileName)
+            Intent.createChooser(shareIntent, "이미지 공유")
         )
     }
 

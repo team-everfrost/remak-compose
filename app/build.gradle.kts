@@ -89,6 +89,8 @@ dependencies {
     implementation(libs.okhttp)
     // lottie
     implementation(libs.lottie)
+    // zoomable
+    implementation(libs.telephoto)
 
 }
 

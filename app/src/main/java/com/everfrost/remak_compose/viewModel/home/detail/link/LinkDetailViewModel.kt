@@ -1,4 +1,4 @@
-package com.everfrost.remak_compose.viewModel.home.link
+package com.everfrost.remak_compose.viewModel.home.detail.link
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -84,7 +84,12 @@ class LinkDetailViewModel @Inject constructor(
     }
 
     private fun formatSummary(summary: String): String { //첫줄 제거
-        return summary.split("\n")[0]
+        val lines = summary.split("\n")
+        if (lines.size > 1) {
+            return lines.subList(1, lines.size).joinToString("\n")
+        } else {
+            return summary
+        }
     }
 
 }

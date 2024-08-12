@@ -31,7 +31,7 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     color = white
                 ) {
-                    RemakApp(startDestination = RemakScreen.LinkDetail.route)
+                    RemakApp(startDestination = RemakScreen.ImageDetail.route)
                 }
             }
         }

@@ -30,8 +30,10 @@ import com.everfrost.remak_compose.view.home.add.AddLoadingScreen
 import com.everfrost.remak_compose.view.home.add.AddScreen
 import com.everfrost.remak_compose.view.home.add.LinkAddScreen
 import com.everfrost.remak_compose.view.home.add.MemoAddScreen
-import com.everfrost.remak_compose.view.home.files.FileDetailScreen
-import com.everfrost.remak_compose.view.home.link.LinkDetailScreen
+import com.everfrost.remak_compose.view.home.detail.files.FileDetailScreen
+import com.everfrost.remak_compose.view.home.detail.image.ImageDetailScreen
+import com.everfrost.remak_compose.view.home.detail.image.ImageViewerScreen
+import com.everfrost.remak_compose.view.home.detail.link.LinkDetailScreen
 import com.everfrost.remak_compose.view.home.main.HomeMainScreen
 import com.everfrost.remak_compose.view.profile.ProfileScreen
 
@@ -45,6 +47,8 @@ enum class RemakScreen(val route: String, val title: String, val icon: Int? = nu
     Collection("Collection", "컬렉션", icon = R.drawable.icon_collection),
     Profile("Profile", "프로필", icon = R.drawable.icon_profile),
     LinkDetail("LinkDetail/{docId}", "링크 상세"),
+    ImageDetail("ImageDetail/{docId}", "이미지 상세"),
+    ImageViewer("ImageViewer", "이미지 뷰어"),
     FileDetail("FileDetail/{docId}", "파일 상세"),
     Add("Add", "추가"),
     AddLoading("AddLoading", "추가 중"),
@@ -189,6 +193,46 @@ fun RemakApp(
             )
         }
 
+        composable(
+            // 이미지 상세
+            route = RemakScreen.ImageDetail.route,
+            arguments = listOf(
+                navArgument("docId") { type = NavType.StringType }
+            ),
+            enterTransition = {
+                fadeIn(animationSpec = tween(400))
+            },
+            exitTransition = {
+                fadeOut(animationSpec = tween(400))
+            },
+        ) { backStackEntry ->
+            val docIdx = backStackEntry.arguments?.getString("docId")
+            ImageDetailScreen(
+                navController = navController,
+                viewModel = hiltViewModel(),
+//                docIdx = docIdx
+            )
+        }
+
+        composable(
+            route = RemakScreen.ImageViewer.route,
+            enterTransition = {
+                fadeIn(animationSpec = tween(400))
+            },
+            exitTransition = {
+                fadeOut(animationSpec = tween(400))
+            },
+        ) { backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(RemakScreen.ImageDetail.route)
+            }
+            ImageViewerScreen(
+                navController = navController, viewModel = hiltViewModel(
+                    parentEntry
+                )
+            )
+        }
+
 
         composable(
             route = RemakScreen.FileDetail.route,
@@ -261,7 +305,6 @@ fun RemakApp(
                 viewModel = hiltViewModel()
             )
         }
-
 
     }
 

@@ -1,4 +1,4 @@
-package com.everfrost.remak_compose.view.home.link
+package com.everfrost.remak_compose.view.home.detail.link
 
 import android.annotation.SuppressLint
 import android.net.Uri
@@ -32,10 +32,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -44,20 +42,17 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import com.everfrost.remak_compose.R
-import com.everfrost.remak_compose.model.APIResponse
-import com.everfrost.remak_compose.ui.theme.bgGray1
-import com.everfrost.remak_compose.ui.theme.bgGray2
 import com.everfrost.remak_compose.ui.theme.bgGray4
 import com.everfrost.remak_compose.ui.theme.black1
 import com.everfrost.remak_compose.ui.theme.black3
-import com.everfrost.remak_compose.ui.theme.gray3
 import com.everfrost.remak_compose.ui.theme.pretendard
 import com.everfrost.remak_compose.ui.theme.strokeGray2
 import com.everfrost.remak_compose.ui.theme.white
 import com.everfrost.remak_compose.view.common.appbar.DetailAppBar
 import com.everfrost.remak_compose.view.common.button.PrimaryButton
 import com.everfrost.remak_compose.view.common.layout.TagRowLayout
-import com.everfrost.remak_compose.viewModel.home.link.LinkDetailViewModel
+import com.everfrost.remak_compose.view.home.detail.SummaryBoxWidget
+import com.everfrost.remak_compose.viewModel.home.detail.link.LinkDetailViewModel
 
 
 @Composable
@@ -238,30 +233,8 @@ fun LinkDetailScreen(
                         ), modifier = Modifier.padding(top = 24.dp)
                     )
 
-                    Box(
-                        modifier = Modifier
-                            .padding(top = 16.dp)
-                            .fillMaxWidth()
-                            .heightIn(min = 80.dp)
-                            .background(white, shape = RoundedCornerShape(12.dp))
-                            .border(
-                                width = 1.dp,
-                                color = strokeGray2,
-                                shape = RoundedCornerShape(12.dp)
-                            )
-                            .padding(horizontal = 16.dp, vertical = 20.dp)
-                    ) {
-                        Text(
-                            text = summary,
-                            style = TextStyle(
-                                fontSize = 14.sp,
-                                fontFamily = pretendard,
-                                color = black1,
-                                fontWeight = FontWeight.Normal
-                            ),
-                            modifier = Modifier
-                        )
-                    }
+                    SummaryBoxWidget(summary = summary)
+
                     Box(modifier = Modifier.height(16.dp))
 
                     AndroidView(

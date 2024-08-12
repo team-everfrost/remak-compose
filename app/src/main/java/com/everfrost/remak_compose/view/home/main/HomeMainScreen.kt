@@ -208,6 +208,8 @@ fun HomeMainScreen(
                                 onShortTab = {
                                     if (isEditMode) {
                                         viewModel.toggleSelect(index)
+                                    } else {
+                                        navController.navigate("MemoDetail/${mainList[index].docId}")
                                     }
                                 },
                                 onLongTab = {

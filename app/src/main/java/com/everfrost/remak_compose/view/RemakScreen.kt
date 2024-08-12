@@ -34,6 +34,7 @@ import com.everfrost.remak_compose.view.home.detail.files.FileDetailScreen
 import com.everfrost.remak_compose.view.home.detail.image.ImageDetailScreen
 import com.everfrost.remak_compose.view.home.detail.image.ImageViewerScreen
 import com.everfrost.remak_compose.view.home.detail.link.LinkDetailScreen
+import com.everfrost.remak_compose.view.home.detail.memo.MemoDetailScreen
 import com.everfrost.remak_compose.view.home.main.HomeMainScreen
 import com.everfrost.remak_compose.view.profile.ProfileScreen
 
@@ -50,6 +51,7 @@ enum class RemakScreen(val route: String, val title: String, val icon: Int? = nu
     ImageDetail("ImageDetail/{docId}", "이미지 상세"),
     ImageViewer("ImageViewer", "이미지 뷰어"),
     FileDetail("FileDetail/{docId}", "파일 상세"),
+    MemoDetail("MemoDetail/{docId}", "메모 상세"),
     Add("Add", "추가"),
     AddLoading("AddLoading", "추가 중"),
     LinkAdd("LinkAdd", "링크 추가"),
@@ -233,7 +235,6 @@ fun RemakApp(
             )
         }
 
-
         composable(
             route = RemakScreen.FileDetail.route,
             arguments = listOf(
@@ -248,6 +249,26 @@ fun RemakApp(
         ) { backStackEntry ->
             val docIdx = backStackEntry.arguments?.getString("docId")
             FileDetailScreen(
+                navController = navController,
+                viewModel = hiltViewModel(),
+                docIdx = docIdx
+            )
+        }
+
+        composable(
+            route = RemakScreen.MemoDetail.route,
+            arguments = listOf(
+                navArgument("docId") { type = NavType.StringType }
+            ),
+            enterTransition = {
+                fadeIn(animationSpec = tween(400))
+            },
+            exitTransition = {
+                fadeOut(animationSpec = tween(400))
+            },
+        ) { backStackEntry ->
+            val docIdx = backStackEntry.arguments?.getString("docId")
+            MemoDetailScreen(
                 navController = navController,
                 viewModel = hiltViewModel(),
                 docIdx = docIdx

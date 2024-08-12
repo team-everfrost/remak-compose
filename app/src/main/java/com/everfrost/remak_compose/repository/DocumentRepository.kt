@@ -3,6 +3,7 @@ package com.everfrost.remak_compose.repository
 import com.everfrost.remak_compose.dataSource.RemoteDataSource
 import com.everfrost.remak_compose.model.APIResponse
 import com.everfrost.remak_compose.model.home.add.CreateModel
+import com.everfrost.remak_compose.model.home.detail.UpdateModel
 import com.everfrost.remak_compose.model.home.file.DownloadModel
 import com.everfrost.remak_compose.model.home.file.UploadFileModel
 import com.everfrost.remak_compose.model.home.main.MainListModel
@@ -26,6 +27,12 @@ interface DocumentRepository {
 
     //메모 업로드
     suspend fun createMemo(body: CreateModel.MemoRequestBody): APIResponse<CreateModel.MemoResponseBody>
+
+    //메모 수정
+    suspend fun updateMemo(
+        docId: String,
+        body: UpdateModel.MemoRequestBody
+    ): APIResponse<UpdateModel.MemoResponseBody>
 
 }
 
@@ -125,6 +132,31 @@ class DocumentRepositoryImpl(
     override suspend fun createMemo(body: CreateModel.MemoRequestBody): APIResponse<CreateModel.MemoResponseBody> {
         try {
             val response = remoteDataSource.createMemo(body)
+            return if (response.isSuccessful) {
+                APIResponse.Success(data = response.body())
+            } else {
+                APIResponse.Error(
+                    message = "message: ${
+                        response.errorBody()!!.string()
+                    }",
+                    errorCode = response.code().toString()
+                )
+            }
+        } catch (e: Exception) {
+            return APIResponse.Error(
+                message = "Sign in failed: ${e.message}",
+                errorCode = "500"
+            )
+        }
+    }
+
+    //메모 수정
+    override suspend fun updateMemo(
+        docId: String,
+        body: UpdateModel.MemoRequestBody
+    ): APIResponse<UpdateModel.MemoResponseBody> {
+        try {
+            val response = remoteDataSource.updateMemo(docId, body)
             return if (response.isSuccessful) {
                 APIResponse.Success(data = response.body())
             } else {

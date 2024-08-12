@@ -97,7 +97,7 @@ fun CustomSelectDialog(
                         Text(
                             text = cancelBtnText,
                             style = TextStyle(
-                                fontSize = 14.sp,
+                                fontSize = 18.sp,
                                 fontFamily = pretendard,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.Black
@@ -123,7 +123,7 @@ fun CustomSelectDialog(
                         Text(
                             text = confirmBtnText,
                             style = TextStyle(
-                                fontSize = 14.sp,
+                                fontSize = 18.sp,
                                 fontFamily = pretendard,
                                 fontWeight = FontWeight.Bold
                             )

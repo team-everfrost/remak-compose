@@ -2,6 +2,7 @@ package com.everfrost.remak_compose.service
 
 import com.everfrost.remak_compose.model.account.SignInModel
 import com.everfrost.remak_compose.model.home.add.CreateModel
+import com.everfrost.remak_compose.model.home.detail.UpdateModel
 import com.everfrost.remak_compose.model.home.file.DownloadModel
 import com.everfrost.remak_compose.model.home.file.UploadFileModel
 import com.everfrost.remak_compose.model.home.main.MainListModel
@@ -9,6 +10,7 @@ import okhttp3.MultipartBody
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Multipart
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.Path
@@ -56,6 +58,13 @@ interface ApiService {
     //메모 생성
     @POST("document/memo")
     suspend fun createMemo(@Body body: CreateModel.MemoRequestBody): retrofit2.Response<CreateModel.MemoResponseBody>
+
+    //메모 수정
+    @PATCH("document/memo/{docId}")
+    suspend fun updateMemo(
+        @Path("docId") docId: String,
+        @Body body: UpdateModel.MemoRequestBody
+    ): retrofit2.Response<UpdateModel.MemoResponseBody>
 
 
 }

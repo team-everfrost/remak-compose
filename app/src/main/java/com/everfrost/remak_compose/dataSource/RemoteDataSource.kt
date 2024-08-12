@@ -2,6 +2,7 @@ package com.everfrost.remak_compose.dataSource
 
 import com.everfrost.remak_compose.model.account.SignInModel
 import com.everfrost.remak_compose.model.home.add.CreateModel
+import com.everfrost.remak_compose.model.home.detail.UpdateModel
 import com.everfrost.remak_compose.model.home.file.DownloadModel
 import com.everfrost.remak_compose.model.home.file.UploadFileModel
 import com.everfrost.remak_compose.model.home.main.MainListModel
@@ -34,6 +35,12 @@ interface RemoteDataSource {
 
     //메모 업로드
     suspend fun createMemo(body: CreateModel.MemoRequestBody): Response<CreateModel.MemoResponseBody>
+
+    //메모 수정
+    suspend fun updateMemo(
+        docId: String,
+        body: UpdateModel.MemoRequestBody
+    ): Response<UpdateModel.MemoResponseBody>
 
 
 }
@@ -88,6 +95,14 @@ class RemoteDataSourceImpl @Inject constructor(
     //메모 업로드
     override suspend fun createMemo(body: CreateModel.MemoRequestBody): Response<CreateModel.MemoResponseBody> {
         return apiService.createMemo(body)
+    }
+
+    //메모 수정
+    override suspend fun updateMemo(
+        docId: String,
+        body: UpdateModel.MemoRequestBody
+    ): Response<UpdateModel.MemoResponseBody> {
+        return apiService.updateMemo(docId, body)
     }
 
 }

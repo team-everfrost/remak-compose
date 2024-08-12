@@ -2,6 +2,8 @@ package com.everfrost.remak_compose.view.common.appbar
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -32,6 +34,7 @@ import androidx.compose.ui.unit.sp
 import com.everfrost.remak_compose.R
 import com.everfrost.remak_compose.ui.theme.bgGray2
 import com.everfrost.remak_compose.ui.theme.bgGray4
+import com.everfrost.remak_compose.ui.theme.black1
 import com.everfrost.remak_compose.ui.theme.black3
 import com.everfrost.remak_compose.ui.theme.gray3
 import com.everfrost.remak_compose.ui.theme.pretendard
@@ -47,9 +50,11 @@ fun DetailAppBar(
     isShareEnable: Boolean,
     shareClick: () -> Unit,
     dropDownMenuContent: @Composable (() -> Unit),
-    hasScrolled: Boolean = false
+    hasScrolled: Boolean = false,
+    isEditMode: Boolean = false,
+    onEditComplete: () -> Unit = {},
 
-) {
+    ) {
     var isDropDownExpanded by remember { mutableStateOf(false) }
 
     CenterAlignedTopAppBar(
@@ -84,7 +89,6 @@ fun DetailAppBar(
             )
         },
         title = {
-
             Text(
                 modifier = Modifier,
                 text = title,
@@ -109,24 +113,48 @@ fun DetailAppBar(
                     }
                 )
             }
-            IconButton(
-                onClick = {
-                    isDropDownExpanded = true
-                },
-                content = {
-                    Icon(
-                        painter = painterResource(id = R.drawable.icon_more),
-                        contentDescription = "more"
-                    )
-                }
-            )
+            if (isEditMode) {
+                Text(
+                    text = "완료",
+                    Modifier
+                        .padding(end = 16.dp)
+                        .clickable(
+                            //ripple제거
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ) {
+                            onEditComplete()
 
-            DropdownMenu(
-                expanded = isDropDownExpanded,
-                onDismissRequest = { isDropDownExpanded = false },
-                modifier = Modifier.background(Color.White)
-            ) {
-                dropDownMenuContent()
+                        },
+                    style = TextStyle(
+                        color = black1,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Medium,
+                        fontFamily = pretendard
+                    )
+                )
+
+            } else {
+                IconButton(
+                    onClick = {
+                        isDropDownExpanded = true
+                    },
+                    content = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.icon_more),
+                            contentDescription = "more"
+                        )
+                    }
+                )
+
+                DropdownMenu(
+                    expanded = isDropDownExpanded,
+                    onDismissRequest = { isDropDownExpanded = false },
+                    modifier = Modifier.background(Color.White)
+                ) {
+                    dropDownMenuContent()
+                }
+
             }
         }
     )

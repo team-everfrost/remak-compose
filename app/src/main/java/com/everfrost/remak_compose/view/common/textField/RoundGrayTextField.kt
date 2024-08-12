@@ -42,15 +42,23 @@ fun RoundGrayTextField(
     modifier: Modifier = Modifier,
     placeholder: String,
     keyboardOptions: KeyboardOptions,
-    isEnable: Boolean = true
+    isEnable: Boolean = true,
+    onFocusChange: (Boolean) -> Unit = {}, // 포커스 상태 변화 콜백,
+    focusRequester: FocusRequester = FocusRequester()
 ) {
+    var isFocused by remember { mutableStateOf(false) }
 
     BasicTextField(
         value = value,
         keyboardOptions = keyboardOptions,
         onValueChange = onValueChange,
         enabled = isEnable,
-        modifier = modifier,
+        modifier = modifier
+            .focusRequester(focusRequester)
+            .onFocusChanged { focusState ->
+                isFocused = focusState.isFocused
+                onFocusChange(isFocused)
+            },
 
         textStyle = TextStyle(
             fontSize = 14.sp,

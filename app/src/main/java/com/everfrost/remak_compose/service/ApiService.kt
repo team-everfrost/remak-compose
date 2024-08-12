@@ -76,5 +76,14 @@ interface ApiService {
         @Query("query") query: String?
     ): retrofit2.Response<TagListModel.Response>
 
+    //태그 디테일 리스트
+    @GET("document/search/tag")
+    suspend fun getTagDetailData(
+        @Query("tagName") tagName: String?,
+        @Query("cursor") cursor: String?,
+        @Query("doc-id") docID: String?,
+        @Query("limit") limit: Int? = 20
+    ): retrofit2.Response<MainListModel.Response>
+
 
 }

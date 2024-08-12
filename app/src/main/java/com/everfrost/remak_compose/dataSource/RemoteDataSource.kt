@@ -50,6 +50,13 @@ interface RemoteDataSource {
         query: String?
     ): Response<TagListModel.Response>
 
+    //태그 상세
+    suspend fun getTagDetailData(
+        tagName: String,
+        cursor: String?,
+        docId: String?
+    ): Response<MainListModel.Response>
+
 
 }
 
@@ -117,6 +124,15 @@ class RemoteDataSourceImpl @Inject constructor(
     //태그 리스트
     override suspend fun getTagList(offset: Int?, query: String?): Response<TagListModel.Response> {
         return apiService.getTagListData(limit = 20, offset, query = query)
+    }
+
+    //태그 상세
+    override suspend fun getTagDetailData(
+        tagName: String,
+        cursor: String?,
+        docId: String?
+    ): Response<MainListModel.Response> {
+        return apiService.getTagDetailData(tagName, cursor, docId)
     }
 
 }

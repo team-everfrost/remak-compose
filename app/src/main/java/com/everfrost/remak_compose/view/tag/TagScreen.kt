@@ -1,3 +1,5 @@
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -120,7 +122,14 @@ fun TagScreen(
                             modifier = Modifier
                                 .padding(bottom = 12.dp)
                                 .fillMaxWidth()
-                                .height(72.dp),
+                                .height(72.dp)
+                                .clickable(
+                                    //ripple제거
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    indication = null
+                                ) {
+                                    navController.navigate("TagDetail/${tagList[index].name}/${tagList[index].count}")
+                                },
                             tagName = tagList[index].name,
                             tagCount = tagList[index].count
                         )

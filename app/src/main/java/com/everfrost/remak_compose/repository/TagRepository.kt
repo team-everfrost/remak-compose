@@ -11,6 +11,12 @@ interface TagRepository {
         offset: Int?,
         query: String?
     ): APIResponse<TagListModel.Response>
+
+    suspend fun getTagDetailData(
+        tagName: String,
+        cursor: String?,
+        docId: String?
+    ): APIResponse<MainListModel.Response>
 }
 
 class TagRepositoryImpl(
@@ -22,6 +28,31 @@ class TagRepositoryImpl(
     ): APIResponse<TagListModel.Response> {
         try {
             val response = remoteDataSource.getTagList(offset, query)
+            return if (response.isSuccessful) {
+                APIResponse.Success(data = response.body())
+            } else {
+                APIResponse.Error(
+                    message = "message: ${
+                        response.errorBody()!!.string()
+                    }",
+                    errorCode = response.code().toString()
+                )
+            }
+        } catch (e: Exception) {
+            return APIResponse.Error(
+                message = "Sign in failed: ${e.message}",
+                errorCode = "500"
+            )
+        }
+    }
+
+    override suspend fun getTagDetailData(
+        tagName: String,
+        cursor: String?,
+        docId: String?
+    ): APIResponse<MainListModel.Response> {
+        try {
+            val response = remoteDataSource.getTagDetailData(tagName, cursor, docId)
             return if (response.isSuccessful) {
                 APIResponse.Success(data = response.body())
             } else {

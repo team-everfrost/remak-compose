@@ -25,6 +25,7 @@ import androidx.navigation.navArgument
 import com.everfrost.remak_compose.R
 import com.everfrost.remak_compose.view.account.onboarding.OnboardingScreen
 import com.everfrost.remak_compose.view.account.signin.SignInScreen
+import com.everfrost.remak_compose.view.collection.AddCollectionScreen
 import com.everfrost.remak_compose.view.collection.CollectionScreen
 import com.everfrost.remak_compose.view.home.add.AddLoadingScreen
 import com.everfrost.remak_compose.view.home.add.AddScreen
@@ -48,6 +49,7 @@ enum class RemakScreen(val route: String, val title: String, val icon: Int? = nu
     Tag("Tag", "태그", icon = R.drawable.icon_tag),
     TagDetail("TagDetail/{tagName}/{tagCount}", "태그 상세"),
     Collection("Collection", "컬렉션", icon = R.drawable.icon_collection),
+    AddCollection("AddCollection", "컬렉션 추가"),
     Profile("Profile", "프로필", icon = R.drawable.icon_profile),
     LinkDetail("LinkDetail/{docId}", "링크 상세"),
     ImageDetail("ImageDetail/{docId}", "이미지 상세"),
@@ -186,6 +188,22 @@ fun RemakApp(
         ) {
             // MainScreen(navController = navController)
             CollectionScreen(
+                navController = navController,
+                viewModel = hiltViewModel()
+            )
+        }
+
+        composable(
+            route = RemakScreen.AddCollection.route,
+            enterTransition = {
+                fadeIn(animationSpec = tween(400))
+            },
+            exitTransition = {
+                fadeOut(animationSpec = tween(400))
+            },
+        ) {
+            // MainScreen(navController = navController)
+            AddCollectionScreen(
                 navController = navController,
                 viewModel = hiltViewModel()
             )

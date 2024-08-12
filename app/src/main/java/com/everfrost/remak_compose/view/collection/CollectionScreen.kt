@@ -26,10 +26,12 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import com.everfrost.remak_compose.R
+import com.everfrost.remak_compose.model.APIResponse
 import com.everfrost.remak_compose.ui.theme.bgGray2
 import com.everfrost.remak_compose.ui.theme.pretendard
 import com.everfrost.remak_compose.ui.theme.textBlack3
 import com.everfrost.remak_compose.view.BottomNav
+import com.everfrost.remak_compose.view.RemakScreen
 import com.everfrost.remak_compose.view.common.button.GrayButton
 import com.everfrost.remak_compose.view.home.main.AddDataButton
 import com.everfrost.remak_compose.viewModel.home.collection.CollectionViewModel
@@ -53,7 +55,6 @@ fun CollectionScreen(
 
     Scaffold(
         containerColor = bgGray2,
-
         bottomBar = {
             BottomNav(navController = navController)
         }
@@ -82,73 +83,77 @@ fun CollectionScreen(
                             modifier = Modifier
                                 .width(67.dp)
                                 .height(30.dp),
-                            onClick = { /*TODO*/ },
+                            onClick = {
+                                navController.navigate(RemakScreen.AddCollection.route)
+                            },
                             text = "추가하기"
                         )
                 }
-                if (collectionList.isNotEmpty()) {
-                    Spacer(modifier = Modifier.height(60.dp))
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(2),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                        horizontalArrangement = Arrangement.spacedBy(
-                            8.dp
-                        ),
-                    ) {
-                        items(collectionList.size) { index ->
-                            CollectionListItem(
+                if (collectionListState is APIResponse.Success) {
+                    if (collectionList.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(60.dp))
+                        LazyVerticalGrid(
+                            columns = GridCells.Fixed(2),
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(
+                                8.dp
+                            ),
+                        ) {
+                            items(collectionList.size) { index ->
+                                CollectionListItem(
+                                    modifier = Modifier
+                                        .height(120.dp),
+                                    collectionName = collectionList[index].name,
+                                    collectionDescription = collectionList[index].description,
+                                    collectionCount = collectionList[index].count,
+                                )
+                            }
+
+                        }
+                    } else {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize(),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+
+                        ) {
+                            GlideImage(
+                                imageModel = { R.drawable.icon_empty_box },
                                 modifier = Modifier
-                                    .height(120.dp),
-                                collectionName = collectionList[index].name,
-                                collectionDescription = collectionList[index].description,
-                                collectionCount = collectionList[index].count,
+                                    .width(108.dp)
+                                    .align(Alignment.CenterHorizontally),
+                            )
+                            Text(
+                                text = "등록된 정보가 없어요", style = TextStyle(
+                                    fontFamily = pretendard,
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Normal,
+                                    color = textBlack3
+                                ),
+                                modifier = Modifier
+                                    .padding(top = 24.dp)
+                                    .align(Alignment.CenterHorizontally)
+                            )
+                            AddDataButton(
+                                modifier = Modifier
+                                    .padding(top = 24.dp)
+                                    .width(148.dp)
+                                    .height(40.dp)
+                                    .align(Alignment.CenterHorizontally),
+                                onClick = { /*TODO*/ },
+                                title = "새 컬렉션 만들기",
+                                textStyle = TextStyle(
+                                    fontFamily = pretendard,
+                                    fontSize = 16.sp,
+                                    color = textBlack3,
+                                    fontWeight = FontWeight.Medium
+                                )
                             )
                         }
-
-                    }
-                } else {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize(),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-
-                    ) {
-                        GlideImage(
-                            imageModel = { R.drawable.icon_empty_box },
-                            modifier = Modifier
-                                .width(108.dp)
-                                .align(Alignment.CenterHorizontally),
-                        )
-                        Text(
-                            text = "등록된 정보가 없어요", style = TextStyle(
-                                fontFamily = pretendard,
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Normal,
-                                color = textBlack3
-                            ),
-                            modifier = Modifier
-                                .padding(top = 24.dp)
-                                .align(Alignment.CenterHorizontally)
-                        )
-                        AddDataButton(
-                            modifier = Modifier
-                                .padding(top = 24.dp)
-                                .width(148.dp)
-                                .height(40.dp)
-                                .align(Alignment.CenterHorizontally),
-                            onClick = { /*TODO*/ },
-                            title = "새 컬렉션 만들기",
-                            textStyle = TextStyle(
-                                fontFamily = pretendard,
-                                fontSize = 16.sp,
-                                color = textBlack3,
-                                fontWeight = FontWeight.Medium
-                            )
-                        )
                     }
                 }
-            }// Column
+            }
 
         }
 

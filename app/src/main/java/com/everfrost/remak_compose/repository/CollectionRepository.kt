@@ -3,12 +3,19 @@ package com.everfrost.remak_compose.repository
 import com.everfrost.remak_compose.dataSource.RemoteDataSource
 import com.everfrost.remak_compose.model.APIResponse
 import com.everfrost.remak_compose.model.collection.CollectionListModel
+import com.everfrost.remak_compose.model.collection.CreateCollectionModel
 import com.everfrost.remak_compose.model.home.main.MainListModel
 
 interface CollectionRepository {
     //collection--------------------------------------------------------------------------------------------
     //컬렉션 리스트
     suspend fun getCollectionList(): APIResponse<CollectionListModel.Response>
+
+    //컬렉션 추가
+    suspend fun createCollection(
+        name: String,
+        description: String
+    ): APIResponse<CreateCollectionModel.ResponseBody>
 
 }
 
@@ -35,6 +42,29 @@ class CollectionRepositoryImpl(
                 errorCode = "500"
             )
         }
+    }
 
+    override suspend fun createCollection(
+        name: String,
+        description: String
+    ): APIResponse<CreateCollectionModel.ResponseBody> {
+        try {
+            val response = remoteDataSource.createCollection(name, description)
+            return if (response.isSuccessful) {
+                APIResponse.Success(data = response.body())
+            } else {
+                APIResponse.Error(
+                    message = "message: ${
+                        response.errorBody()!!.string()
+                    }",
+                    errorCode = response.code().toString()
+                )
+            }
+        } catch (e: Exception) {
+            return APIResponse.Error(
+                message = "Sign in failed: ${e.message}",
+                errorCode = "500"
+            )
+        }
     }
 }

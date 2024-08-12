@@ -76,7 +76,8 @@ fun CollectionListItem(
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     fontFamily = pretendard,
-                    color = primaryBlue
+                    color = if (collectionCount == 0) black3 else
+                        primaryBlue
                 ),
                 textAlign = TextAlign.End,
                 modifier = Modifier.fillMaxWidth()

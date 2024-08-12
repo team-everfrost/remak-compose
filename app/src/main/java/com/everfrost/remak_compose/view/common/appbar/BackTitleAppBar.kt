@@ -15,6 +15,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -29,11 +30,12 @@ import com.everfrost.remak_compose.ui.theme.white
 @Composable
 fun BackTitleAppBar(
     navController: NavController,
-    title: String
+    title: String,
+    color: Color = white
 ) {
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = white,
+            containerColor = color,
         ),
         navigationIcon = {
             IconButton(

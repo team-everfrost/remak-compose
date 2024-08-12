@@ -2,6 +2,7 @@ package com.everfrost.remak_compose.service
 
 import com.everfrost.remak_compose.model.account.SignInModel
 import com.everfrost.remak_compose.model.collection.CollectionListModel
+import com.everfrost.remak_compose.model.collection.CreateCollectionModel
 import com.everfrost.remak_compose.model.home.add.CreateModel
 import com.everfrost.remak_compose.model.home.detail.UpdateModel
 import com.everfrost.remak_compose.model.home.file.DownloadModel
@@ -93,6 +94,10 @@ interface ApiService {
         @Query("limit") limit: Int? = 20,
         @Query("offset") offset: Int?
     ): retrofit2.Response<CollectionListModel.Response>
+
+    //컬렉션 추가
+    @POST("collection")
+    suspend fun createCollection(@Body body: CreateCollectionModel.RequestBody): retrofit2.Response<CreateCollectionModel.ResponseBody>
 
 
 }

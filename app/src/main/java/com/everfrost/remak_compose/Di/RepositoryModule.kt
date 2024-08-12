@@ -3,6 +3,8 @@ package com.everfrost.remak_compose.Di
 import com.everfrost.remak_compose.dataSource.RemoteDataSource
 import com.everfrost.remak_compose.repository.AccountRepository
 import com.everfrost.remak_compose.repository.AccountRepositoryImpl
+import com.everfrost.remak_compose.repository.CollectionRepository
+import com.everfrost.remak_compose.repository.CollectionRepositoryImpl
 import com.everfrost.remak_compose.repository.DocumentRepository
 import com.everfrost.remak_compose.repository.DocumentRepositoryImpl
 import com.everfrost.remak_compose.repository.MainRepository
@@ -38,5 +40,10 @@ object RepositoryModule {
     @Singleton
     fun tagRepository(remoteDataSource: RemoteDataSource): TagRepository =
         TagRepositoryImpl(remoteDataSource)
+
+    @Provides
+    @Singleton
+    fun collectionRepository(remoteDataSource: RemoteDataSource): CollectionRepository =
+        CollectionRepositoryImpl(remoteDataSource)
 
 }

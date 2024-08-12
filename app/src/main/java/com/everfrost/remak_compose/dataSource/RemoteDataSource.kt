@@ -1,6 +1,7 @@
 package com.everfrost.remak_compose.dataSource
 
 import com.everfrost.remak_compose.model.account.SignInModel
+import com.everfrost.remak_compose.model.collection.CollectionListModel
 import com.everfrost.remak_compose.model.home.add.CreateModel
 import com.everfrost.remak_compose.model.home.detail.UpdateModel
 import com.everfrost.remak_compose.model.home.file.DownloadModel
@@ -56,6 +57,12 @@ interface RemoteDataSource {
         cursor: String?,
         docId: String?
     ): Response<MainListModel.Response>
+
+    //collection--------------------------------------------------------------------------------------------
+    //컬렉션 리스트
+    suspend fun getCollectionList(
+
+    ): Response<CollectionListModel.Response>
 
 
 }
@@ -133,6 +140,15 @@ class RemoteDataSourceImpl @Inject constructor(
         docId: String?
     ): Response<MainListModel.Response> {
         return apiService.getTagDetailData(tagName, cursor, docId)
+    }
+
+
+    //collection--------------------------------------------------------------------------------------------
+    //컬렉션 리스트
+    override suspend fun getCollectionList(
+
+    ): Response<CollectionListModel.Response> {
+        return apiService.getCollectionListData(offset = 0, limit = 20)
     }
 
 }

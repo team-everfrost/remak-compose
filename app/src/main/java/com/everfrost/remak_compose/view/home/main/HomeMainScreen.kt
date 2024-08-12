@@ -181,6 +181,7 @@ fun HomeMainScreen(
                             fontFamily = pretendard,
                             fontSize = 16.sp,
                             color = textBlack3,
+                            fontWeight = FontWeight.Medium
                         )
                     )
                 }

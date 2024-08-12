@@ -186,7 +186,8 @@ fun RemakApp(
         ) {
             // MainScreen(navController = navController)
             CollectionScreen(
-                navController = navController
+                navController = navController,
+                viewModel = hiltViewModel()
             )
         }
 

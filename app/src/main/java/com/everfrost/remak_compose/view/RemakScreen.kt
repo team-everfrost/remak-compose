@@ -26,7 +26,9 @@ import com.everfrost.remak_compose.R
 import com.everfrost.remak_compose.view.account.onboarding.OnboardingScreen
 import com.everfrost.remak_compose.view.account.signin.SignInScreen
 import com.everfrost.remak_compose.view.collection.AddCollectionScreen
+import com.everfrost.remak_compose.view.collection.CollectionDetailScreen
 import com.everfrost.remak_compose.view.collection.CollectionScreen
+import com.everfrost.remak_compose.view.collection.EditCollectionScreen
 import com.everfrost.remak_compose.view.home.add.AddLoadingScreen
 import com.everfrost.remak_compose.view.home.add.AddScreen
 import com.everfrost.remak_compose.view.home.add.LinkAddScreen
@@ -39,6 +41,7 @@ import com.everfrost.remak_compose.view.home.detail.memo.MemoDetailScreen
 import com.everfrost.remak_compose.view.home.main.HomeMainScreen
 import com.everfrost.remak_compose.view.profile.ProfileScreen
 import com.everfrost.remak_compose.view.tag.TagDetailScreen
+import com.everfrost.remak_compose.viewModel.home.collection.CollectionViewModel
 
 
 enum class RemakScreen(val route: String, val title: String, val icon: Int? = null) {
@@ -50,6 +53,8 @@ enum class RemakScreen(val route: String, val title: String, val icon: Int? = nu
     TagDetail("TagDetail/{tagName}/{tagCount}", "태그 상세"),
     Collection("Collection", "컬렉션", icon = R.drawable.icon_collection),
     AddCollection("AddCollection", "컬렉션 추가"),
+    CollectionDetail("CollectionDetail/{collectionName}/{collectionDescription}", "컬렉션 상세"),
+    EditCollection("EditCollection/{collectionName}/{collectionDescription}", "컬렉션 수정"),
     Profile("Profile", "프로필", icon = R.drawable.icon_profile),
     LinkDetail("LinkDetail/{docId}", "링크 상세"),
     ImageDetail("ImageDetail/{docId}", "이미지 상세"),
@@ -131,7 +136,8 @@ fun RemakApp(
         ) { navBackStackEntry ->
             HomeMainScreen(
                 navController = navController,
-                viewModel = hiltViewModel()
+                viewModel = hiltViewModel(),
+                collectionViewModel = hiltViewModel()
             )
         }
 
@@ -206,6 +212,53 @@ fun RemakApp(
             AddCollectionScreen(
                 navController = navController,
                 viewModel = hiltViewModel()
+            )
+        }
+
+        composable(
+            route = RemakScreen.CollectionDetail.route,
+            arguments = listOf(
+                navArgument("collectionName") { type = NavType.StringType }
+            ),
+            enterTransition = {
+                fadeIn(animationSpec = tween(400))
+            },
+            exitTransition = {
+                fadeOut(animationSpec = tween(400))
+            },
+        ) { backStackEntry ->
+            val collectionName = backStackEntry.arguments?.getString("collectionName")
+            val collectionDescription = backStackEntry.arguments?.getString("collectionDescription")
+            // MainScreen(navController = navController)
+            CollectionDetailScreen(
+                navController = navController,
+                viewModel = hiltViewModel(),
+                collectionName = collectionName!!,
+                collectionDescription = collectionDescription
+            )
+        }
+
+        composable(
+            route = RemakScreen.EditCollection.route,
+            arguments = listOf(
+                navArgument("collectionName") { type = NavType.StringType },
+                navArgument("collectionDescription") { type = NavType.StringType }
+            ),
+            enterTransition = {
+                fadeIn(animationSpec = tween(400))
+            },
+            exitTransition = {
+                fadeOut(animationSpec = tween(400))
+            },
+        ) { backStackEntry ->
+            val collectionName = backStackEntry.arguments?.getString("collectionName")
+            val collectionDescription = backStackEntry.arguments?.getString("collectionDescription")
+            // MainScreen(navController = navController)
+            EditCollectionScreen(
+                navController = navController,
+                viewModel = hiltViewModel(),
+                collectionName = collectionName!!,
+                collectionDescription = collectionDescription!!
             )
         }
 

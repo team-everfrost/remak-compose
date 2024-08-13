@@ -31,7 +31,6 @@ fun GrayButton(
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(6.dp))
-
             .background(
                 color = bgBlueGray1
             )

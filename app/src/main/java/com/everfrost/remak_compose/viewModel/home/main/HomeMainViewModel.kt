@@ -6,7 +6,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.everfrost.remak_compose.model.APIResponse
+import com.everfrost.remak_compose.model.DeleteModel
 import com.everfrost.remak_compose.model.home.main.MainListModel
+import com.everfrost.remak_compose.repository.DocumentRepository
 import com.everfrost.remak_compose.repository.MainRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.coroutineScope
@@ -24,7 +26,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeMainViewModel @Inject constructor(
-    private val mainRepository: MainRepository
+    private val mainRepository: MainRepository,
+    private val documentRepository: DocumentRepository
 ) : ViewModel() {
     private var lastScrollIndex = 0
     private val _scrollUp = MutableStateFlow(false)
@@ -57,6 +60,13 @@ class HomeMainViewModel @Inject constructor(
 
     private val _isInit = MutableStateFlow(false)
     val isInit: StateFlow<Boolean> = _isInit
+
+    private val _deleteState =
+        MutableStateFlow<APIResponse<DeleteModel.ResponseBody>>(APIResponse.Empty())
+    val deleteState: StateFlow<APIResponse<DeleteModel.ResponseBody>> = _deleteState
+
+    private val _deleteDialog = MutableStateFlow(false)
+    val deleteDialog: StateFlow<Boolean> = _deleteDialog
 
     fun fetchMainList() {
         _isInit.value = true
@@ -174,7 +184,34 @@ class HomeMainViewModel @Inject constructor(
         if (_mainList.value.all { !it.isSelected }) {
             _isEditMode.value = false
         }
+    }
 
+    fun deleteDocument() {
+        viewModelScope.launch {
+            val selectedList = _mainList.value.filter { it.isSelected }
+            if (selectedList.isEmpty()) return@launch
+            for (data in selectedList) {
+                val response = documentRepository.deleteDocument(data.docId!!)
+                if (response is APIResponse.Success) {
+                    _deleteState.value = response
+                } else {
+                    _deleteState.value = APIResponse.Error(
+                        message = response.message ?: "",
+                        data = response.data,
+                        errorCode = response.errorCode ?: "500"
+                    )
+                }
+            }
+
+        }
+    }
+
+    fun getSelectedDocument(): List<String> {
+        return _mainList.value.filter { it.isSelected }.map { it.docId!! }
+    }
+
+    fun setDeleteDialog(isShow: Boolean) {
+        _deleteDialog.value = isShow
     }
 
 

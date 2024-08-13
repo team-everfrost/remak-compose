@@ -1,6 +1,8 @@
 package com.everfrost.remak_compose.service
 
+import com.everfrost.remak_compose.model.DeleteModel
 import com.everfrost.remak_compose.model.account.SignInModel
+import com.everfrost.remak_compose.model.collection.AddDataInCollectionModel
 import com.everfrost.remak_compose.model.collection.CollectionListModel
 import com.everfrost.remak_compose.model.collection.CreateCollectionModel
 import com.everfrost.remak_compose.model.home.add.CreateModel
@@ -11,6 +13,7 @@ import com.everfrost.remak_compose.model.home.main.MainListModel
 import com.everfrost.remak_compose.model.tag.TagListModel
 import okhttp3.MultipartBody
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.PATCH
@@ -69,6 +72,10 @@ interface ApiService {
         @Body body: UpdateModel.MemoRequestBody
     ): retrofit2.Response<UpdateModel.MemoResponseBody>
 
+    // 자료 삭제
+    @DELETE("document/{docId}")
+    suspend fun deleteDocument(@Path("docId") docId: String): retrofit2.Response<DeleteModel.ResponseBody>
+
     //tag ---------------------------------------------------------
     //태그 리스트
     @GET("tag")
@@ -98,6 +105,29 @@ interface ApiService {
     //컬렉션 추가
     @POST("collection")
     suspend fun createCollection(@Body body: CreateCollectionModel.RequestBody): retrofit2.Response<CreateCollectionModel.ResponseBody>
+
+    //컬렉션 디테일 리스트
+    @GET("document/search/collection")
+    suspend fun getCollectionDetailData(
+        @Query("collectionName") collectionName: String?,
+        @Query("cursor") cursor: String?,
+        @Query("doc-id") docID: String?,
+        @Query("limit") limit: Int? = 20
+    ): retrofit2.Response<MainListModel.Response>
+
+    //컬렉션 수정
+    @PATCH("collection/{name}")
+    suspend fun updateCollection(
+        @Path("name") name: String,
+        @Body body: AddDataInCollectionModel.UpdateCollectionRequestBody
+    ): retrofit2.Response<AddDataInCollectionModel.RemoveResponse>
+
+    //컬렉션에 자료추가
+    @PATCH("collection/{name}")
+    suspend fun addDataInCollection(
+        @Path("name") name: String,
+        @Body body: AddDataInCollectionModel.AddRequestBody
+    ): retrofit2.Response<AddDataInCollectionModel.AddResponse>
 
 
 }

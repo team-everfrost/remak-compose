@@ -2,6 +2,7 @@ package com.everfrost.remak_compose.repository
 
 import com.everfrost.remak_compose.dataSource.RemoteDataSource
 import com.everfrost.remak_compose.model.APIResponse
+import com.everfrost.remak_compose.model.DeleteModel
 import com.everfrost.remak_compose.model.home.add.CreateModel
 import com.everfrost.remak_compose.model.home.detail.UpdateModel
 import com.everfrost.remak_compose.model.home.file.DownloadModel
@@ -33,6 +34,9 @@ interface DocumentRepository {
         docId: String,
         body: UpdateModel.MemoRequestBody
     ): APIResponse<UpdateModel.MemoResponseBody>
+
+    //자료 삭제
+    suspend fun deleteDocument(docId: String): APIResponse<DeleteModel.ResponseBody>
 
 }
 
@@ -157,6 +161,28 @@ class DocumentRepositoryImpl(
     ): APIResponse<UpdateModel.MemoResponseBody> {
         try {
             val response = remoteDataSource.updateMemo(docId, body)
+            return if (response.isSuccessful) {
+                APIResponse.Success(data = response.body())
+            } else {
+                APIResponse.Error(
+                    message = "message: ${
+                        response.errorBody()!!.string()
+                    }",
+                    errorCode = response.code().toString()
+                )
+            }
+        } catch (e: Exception) {
+            return APIResponse.Error(
+                message = "Sign in failed: ${e.message}",
+                errorCode = "500"
+            )
+        }
+    }
+
+    //자료 삭제
+    override suspend fun deleteDocument(docId: String): APIResponse<DeleteModel.ResponseBody> {
+        try {
+            val response = remoteDataSource.deleteDocument(docId)
             return if (response.isSuccessful) {
                 APIResponse.Success(data = response.body())
             } else {

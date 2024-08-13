@@ -3,9 +3,14 @@ package com.everfrost.remak_compose.view.home.main
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,13 +22,18 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material.rememberBottomSheetScaffoldState
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -48,17 +58,22 @@ import androidx.navigation.NavController
 import com.everfrost.remak_compose.R
 import com.everfrost.remak_compose.model.APIResponse
 import com.everfrost.remak_compose.ui.theme.bgGray2
+import com.everfrost.remak_compose.ui.theme.black2
 import com.everfrost.remak_compose.ui.theme.black3
 import com.everfrost.remak_compose.ui.theme.pretendard
+import com.everfrost.remak_compose.ui.theme.red1
 import com.everfrost.remak_compose.ui.theme.textBlack3
 import com.everfrost.remak_compose.ui.theme.white
 import com.everfrost.remak_compose.view.BottomNav
 import com.everfrost.remak_compose.view.RemakScreen
+import com.everfrost.remak_compose.view.collection.CollectionBottomSheet
+import com.everfrost.remak_compose.view.common.dialog.CustomSelectDialog
 import com.everfrost.remak_compose.view.common.layout.FileLayout
 import com.everfrost.remak_compose.view.common.layout.ImageLayout
 import com.everfrost.remak_compose.view.common.layout.LinkLayout
 import com.everfrost.remak_compose.view.common.layout.MemoLayout
 import com.everfrost.remak_compose.view.tool.customHeightBasedOnWidth
+import com.everfrost.remak_compose.viewModel.home.collection.CollectionViewModel
 import com.everfrost.remak_compose.viewModel.home.main.HomeMainViewModel
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
@@ -68,12 +83,14 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
+import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun HomeMainScreen(
     navController: NavController,
-    viewModel: HomeMainViewModel
+    viewModel: HomeMainViewModel,
+    collectionViewModel: CollectionViewModel
 ) {
     val scrollState = rememberLazyListState()
     val scrollUpState by viewModel.scrollUp.collectAsState()
@@ -85,6 +102,38 @@ fun HomeMainScreen(
     val isEditMode by viewModel.isEditMode.collectAsState()
     val haptics = LocalHapticFeedback.current
     val isInit by viewModel.isInit.collectAsState()
+    val deleteDialog by viewModel.deleteDialog.collectAsState()
+
+    val tmpState = rememberBottomSheetScaffoldState()
+
+    var tmpBottomSheet by remember {
+        mutableStateOf(false)
+    }
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = false,
+
+        )
+    val scope = rememberCoroutineScope()
+
+
+    when {
+        deleteDialog ->
+            CustomSelectDialog(
+                onDismissRequest = {
+                    viewModel.setDeleteDialog(false)
+                },
+                onConfirm = {
+                    viewModel.setDeleteDialog(false)
+                    viewModel.deleteDocument()
+                    viewModel.resetMainList()
+                    viewModel.toggleEditMode()
+                },
+                mainTitle = "삭제하시겠습니까?",
+                subTitle = "삭제시 복구가 불가능해요",
+                confirmBtnText = "삭제하기",
+                cancelBtnText = "취소하기"
+            )
+    }
 
     if (!isInit) {
         LaunchedEffect(Unit) {
@@ -134,9 +183,68 @@ fun HomeMainScreen(
         bottomBar = {
             if (!isEditMode) {
                 BottomNav(navController = navController)
+            } else {
+                BottomAppBar(
+                    containerColor = white,
+                    modifier = Modifier
+                        .navigationBarsPadding()
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                ) {
+                    Row(
+                    ) {
+                        Text(
+                            text = "+컬렉션", style = TextStyle(
+                                fontFamily = pretendard,
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = black2
+                            ),
+                            modifier = Modifier.clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null
+                            ) {
+                                tmpBottomSheet = true
+
+                            }
+                        )
+                        Spacer(modifier = Modifier.weight(1f))
+
+                        Text(
+                            text = "삭제하기", style = TextStyle(
+                                fontFamily = pretendard,
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = red1
+                            ),
+                            modifier = Modifier.clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null
+                            ) {
+                                viewModel.setDeleteDialog(true)
+                            }
+                        )
+
+                    }
+
+                }
             }
         },
     ) { innerPadding ->
+
+        if (tmpBottomSheet) {
+            CollectionBottomSheet(
+                onDismissRequest = {
+                    tmpBottomSheet = false
+                }, sheetState =
+                sheetState,
+                collectionViewModel,
+                viewModel.getSelectedDocument(),
+                onConfirm = {
+                    viewModel.toggleEditMode()
+                }
+            )
+        }
 
         Box(
             modifier = Modifier

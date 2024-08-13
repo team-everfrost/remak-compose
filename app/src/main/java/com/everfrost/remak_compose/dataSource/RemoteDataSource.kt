@@ -1,6 +1,8 @@
 package com.everfrost.remak_compose.dataSource
 
+import com.everfrost.remak_compose.model.DeleteModel
 import com.everfrost.remak_compose.model.account.SignInModel
+import com.everfrost.remak_compose.model.collection.AddDataInCollectionModel
 import com.everfrost.remak_compose.model.collection.CollectionListModel
 import com.everfrost.remak_compose.model.collection.CreateCollectionModel
 import com.everfrost.remak_compose.model.home.add.CreateModel
@@ -45,6 +47,9 @@ interface RemoteDataSource {
         body: UpdateModel.MemoRequestBody
     ): Response<UpdateModel.MemoResponseBody>
 
+    //자료 삭제
+    suspend fun deleteDocument(docId: String): Response<DeleteModel.ResponseBody>
+
     //tag--------------------------------------------------------------------------------------------
     //태그 리스트
     suspend fun getTagList(
@@ -69,6 +74,26 @@ interface RemoteDataSource {
         name: String,
         description: String?
     ): Response<CreateCollectionModel.ResponseBody>
+
+    //컬렉션 디테일 리스트
+    suspend fun getCollectionDetailList(
+        collectionId: String,
+        cursor: String?,
+        docId: String?
+    ): Response<MainListModel.Response>
+
+    //컬렉션 수정
+    suspend fun updateCollection(
+        name: String,
+        newName: String,
+        description: String?
+    ): Response<AddDataInCollectionModel.RemoveResponse>
+
+    //컬렉션에 자료추가
+    suspend fun addDataInCollection(
+        name: String,
+        docIds: List<String>
+    ): Response<AddDataInCollectionModel.AddResponse>
 }
 
 class RemoteDataSourceImpl @Inject constructor(
@@ -131,6 +156,11 @@ class RemoteDataSourceImpl @Inject constructor(
         return apiService.updateMemo(docId, body)
     }
 
+    //자료 삭제
+    override suspend fun deleteDocument(docId: String): Response<DeleteModel.ResponseBody> {
+        return apiService.deleteDocument(docId)
+    }
+
     //tag--------------------------------------------------------------------------------------------
     //태그 리스트
     override suspend fun getTagList(offset: Int?, query: String?): Response<TagListModel.Response> {
@@ -164,5 +194,32 @@ class RemoteDataSourceImpl @Inject constructor(
         return apiService.createCollection(requestBody)
     }
 
+    //컬렉션 디테일 리스트
+    override suspend fun getCollectionDetailList(
+        collectionId: String,
+        cursor: String?,
+        docId: String?
+    ): Response<MainListModel.Response> {
+        return apiService.getCollectionDetailData(collectionId, cursor, docId)
+    }
+
+    //컬렉션 수정
+    override suspend fun updateCollection(
+        name: String,
+        newName: String,
+        description: String?
+    ): Response<AddDataInCollectionModel.RemoveResponse> {
+        val requestBody = AddDataInCollectionModel.UpdateCollectionRequestBody(newName, description)
+        return apiService.updateCollection(name, requestBody)
+    }
+
+    //컬렉션에 자료추가
+    override suspend fun addDataInCollection(
+        name: String,
+        docIds: List<String>
+    ): Response<AddDataInCollectionModel.AddResponse> {
+        val requestBody = AddDataInCollectionModel.AddRequestBody(docIds)
+        return apiService.addDataInCollection(name, requestBody)
+    }
 
 }

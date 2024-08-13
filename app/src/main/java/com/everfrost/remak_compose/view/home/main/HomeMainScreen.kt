@@ -5,7 +5,6 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -17,28 +16,22 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
-import androidx.compose.material.rememberBottomSheetScaffoldState
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -52,14 +45,11 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import com.everfrost.remak_compose.R
 import com.everfrost.remak_compose.model.APIResponse
 import com.everfrost.remak_compose.ui.theme.bgGray2
 import com.everfrost.remak_compose.ui.theme.black2
-import com.everfrost.remak_compose.ui.theme.black3
 import com.everfrost.remak_compose.ui.theme.pretendard
 import com.everfrost.remak_compose.ui.theme.red1
 import com.everfrost.remak_compose.ui.theme.textBlack3
@@ -72,18 +62,11 @@ import com.everfrost.remak_compose.view.common.layout.FileLayout
 import com.everfrost.remak_compose.view.common.layout.ImageLayout
 import com.everfrost.remak_compose.view.common.layout.LinkLayout
 import com.everfrost.remak_compose.view.common.layout.MemoLayout
-import com.everfrost.remak_compose.view.tool.customHeightBasedOnWidth
 import com.everfrost.remak_compose.viewModel.home.collection.CollectionViewModel
 import com.everfrost.remak_compose.viewModel.home.main.HomeMainViewModel
-import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.plus
-import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
@@ -104,15 +87,13 @@ fun HomeMainScreen(
     val isInit by viewModel.isInit.collectAsState()
     val deleteDialog by viewModel.deleteDialog.collectAsState()
 
-    val tmpState = rememberBottomSheetScaffoldState()
 
-    var tmpBottomSheet by remember {
+    var collectionBottomSheet by remember {
         mutableStateOf(false)
     }
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = false,
-
-        )
+    )
     val scope = rememberCoroutineScope()
 
 
@@ -148,7 +129,9 @@ fun HomeMainScreen(
     LaunchedEffect(resultState) {
         Log.d("HomeMainScreen", "resultState: ${resultState?.value}")
         if (resultState?.value == true) {
-            Log.d("HomeMainScreen", "resultState: ${resultState?.value}")
+            viewModel.resetMainList()
+            viewModel.fetchMainList()
+            Log.d("HomeMainScreen", "resultState: ${resultState.value}")
         }
 
     }
@@ -204,7 +187,7 @@ fun HomeMainScreen(
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = null
                             ) {
-                                tmpBottomSheet = true
+                                collectionBottomSheet = true
 
                             }
                         )
@@ -231,11 +214,14 @@ fun HomeMainScreen(
             }
         },
     ) { innerPadding ->
-
-        if (tmpBottomSheet) {
+        if (collectionBottomSheet) {
             CollectionBottomSheet(
                 onDismissRequest = {
-                    tmpBottomSheet = false
+                    scope.launch {
+                        sheetState.hide()
+                    }.invokeOnCompletion {
+                        collectionBottomSheet = false
+                    }
                 }, sheetState =
                 sheetState,
                 collectionViewModel,
@@ -255,7 +241,6 @@ fun HomeMainScreen(
         ) {
 
             if (mainListState is APIResponse.Success && mainList.isEmpty()) {
-
                 Column(
                     modifier = Modifier
                         .align(Alignment.Center)
@@ -322,9 +307,7 @@ fun HomeMainScreen(
                                     }
                                 },
                                 onLongTab = {
-                                    if (isEditMode) {
-
-                                    } else {
+                                    if (!isEditMode) {
                                         haptics.performHapticFeedback(
                                             HapticFeedbackType.LongPress
                                         )
@@ -354,9 +337,7 @@ fun HomeMainScreen(
                                     }
                                 },
                                 onLongTab = {
-                                    if (isEditMode) {
-
-                                    } else {
+                                    if (!isEditMode) {
                                         haptics.performHapticFeedback(
                                             HapticFeedbackType.LongPress
                                         )
@@ -383,12 +364,12 @@ fun HomeMainScreen(
                                 onShortTab = {
                                     if (isEditMode) {
                                         viewModel.toggleSelect(index)
+                                    } else {
+                                        navController.navigate("LinkDetail/${mainList[index].docId}")
                                     }
                                 },
                                 onLongTab = {
-                                    if (isEditMode) {
-
-                                    } else {
+                                    if (!isEditMode) {
                                         haptics.performHapticFeedback(
                                             HapticFeedbackType.LongPress
                                         )
@@ -415,12 +396,12 @@ fun HomeMainScreen(
                                     onShortTab = {
                                         if (isEditMode) {
                                             viewModel.toggleSelect(index)
+                                        } else {
+                                            navController.navigate("ImageDetail/${mainList[index].docId}")
                                         }
                                     },
                                     onLongTab = {
-                                        if (isEditMode) {
-
-                                        } else {
+                                        if (!isEditMode) {
                                             haptics.performHapticFeedback(
                                                 HapticFeedbackType.LongPress
                                             )

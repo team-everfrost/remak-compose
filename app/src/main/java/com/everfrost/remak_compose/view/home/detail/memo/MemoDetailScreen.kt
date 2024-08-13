@@ -10,13 +10,18 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
@@ -28,23 +33,34 @@ import androidx.navigation.NavController
 import com.everfrost.remak_compose.ui.theme.black1
 import com.everfrost.remak_compose.ui.theme.black3
 import com.everfrost.remak_compose.ui.theme.pretendard
+import com.everfrost.remak_compose.ui.theme.red1
 import com.everfrost.remak_compose.ui.theme.white
+import com.everfrost.remak_compose.view.collection.CollectionBottomSheet
 import com.everfrost.remak_compose.view.common.appbar.DetailAppBar
 import com.everfrost.remak_compose.view.common.dialog.CustomSelectDialog
 import com.everfrost.remak_compose.view.common.textField.RoundGrayTextField
+import com.everfrost.remak_compose.viewModel.home.collection.CollectionViewModel
 import com.everfrost.remak_compose.viewModel.home.detail.memo.MemoDetailViewModel
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MemoDetailScreen(
-    docIdx: String? = "aa38f544-a43d-47ec-8798-0de378c47276",
+    docIdx: String?,
     viewModel: MemoDetailViewModel,
-    navController: NavController
+    navController: NavController,
+    collectionViewModel: CollectionViewModel
 ) {
 
     LaunchedEffect(true) {
         viewModel.fetchDetailData(docIdx!!)
     }
 
+    val scope = rememberCoroutineScope()
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = false,
+    )
+    val isDeleteComplete by viewModel.isDeleteComplete.collectAsState()
 
     val isEditMode by viewModel.isEditMode.collectAsState()
     val date by viewModel.date.collectAsState()
@@ -52,6 +68,40 @@ fun MemoDetailScreen(
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
     val editCancelDialog by viewModel.editCancelDialog.collectAsState()
+    var deleteDialog by remember {
+        mutableStateOf(false)
+    }
+    var collectionBottomSheet by remember {
+        mutableStateOf(false)
+    }
+
+    when {
+        deleteDialog ->
+            CustomSelectDialog(
+                onDismissRequest = {
+                    deleteDialog = false
+                },
+                onConfirm = {
+                    viewModel.deleteDocument(docIdx!!)
+                    deleteDialog = false
+                },
+                mainTitle = "파일을 삭제하시겠습니까?",
+                subTitle = "삭제시 복구가 불가능해요",
+                confirmBtnText = "삭제하기",
+                cancelBtnText = "취소하기"
+            )
+
+    }
+
+    LaunchedEffect(isDeleteComplete) {
+        if (isDeleteComplete) {
+            navController.previousBackStackEntry?.savedStateHandle?.set(
+                "isUpdate",
+                true
+            )
+            navController.popBackStack()
+        }
+    }
 
     when {
         editCancelDialog ->
@@ -97,12 +147,12 @@ fun MemoDetailScreen(
                 title = "메모",
                 isShareEnable = false,
                 shareClick = { },
-                dropDownMenuContent = {
+                dropDownMenuContent = { dismissMenu ->
                     DropdownMenuItem(
                         modifier = Modifier.height(40.dp),
                         text = {
                             Text(
-                                "편집하기", style = TextStyle(
+                                "컬렉션에 추가", style = TextStyle(
                                     color = black1,
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Medium,
@@ -111,12 +161,46 @@ fun MemoDetailScreen(
                             )
                         },
                         onClick = {
+                            dismissMenu()
+                            collectionBottomSheet = true
+                        }
+                    )
+                    DropdownMenuItem(
+                        modifier = Modifier.height(40.dp),
+                        text = {
+                            Text(
+                                "삭제", style = TextStyle(
+                                    color = red1,
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    fontFamily = pretendard
+                                )
+                            )
+                        },
+                        onClick = {
+                            deleteDialog = true
+                            dismissMenu()
                         }
                     )
                 }
             )
         },
     ) { innerPadding ->
+        if (collectionBottomSheet) {
+            CollectionBottomSheet(
+                onDismissRequest = {
+                    scope.launch {
+                        sheetState.hide()
+                    }.invokeOnCompletion {
+                        collectionBottomSheet = false
+                    }
+                }, sheetState =
+                sheetState,
+                collectionViewModel,
+                listOf(docIdx!!),
+                onConfirm = {}
+            )
+        }
         Box(
             modifier =
             Modifier

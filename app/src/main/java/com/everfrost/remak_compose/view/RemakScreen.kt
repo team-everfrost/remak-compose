@@ -41,7 +41,6 @@ import com.everfrost.remak_compose.view.home.detail.memo.MemoDetailScreen
 import com.everfrost.remak_compose.view.home.main.HomeMainScreen
 import com.everfrost.remak_compose.view.profile.ProfileScreen
 import com.everfrost.remak_compose.view.tag.TagDetailScreen
-import com.everfrost.remak_compose.viewModel.home.collection.CollectionViewModel
 
 
 enum class RemakScreen(val route: String, val title: String, val icon: Int? = null) {
@@ -50,7 +49,7 @@ enum class RemakScreen(val route: String, val title: String, val icon: Int? = nu
     Main("Main", "메인", icon = R.drawable.icon_home),
     Search("Search", "검색", icon = R.drawable.icon_search),
     Tag("Tag", "태그", icon = R.drawable.icon_tag),
-    TagDetail("TagDetail/{tagName}/{tagCount}", "태그 상세"),
+    TagDetail("TagDetail/{tagName}", "태그 상세"),
     Collection("Collection", "컬렉션", icon = R.drawable.icon_collection),
     AddCollection("AddCollection", "컬렉션 추가"),
     CollectionDetail("CollectionDetail/{collectionName}/{collectionDescription}", "컬렉션 상세"),
@@ -168,7 +167,6 @@ fun RemakApp(
             route = RemakScreen.TagDetail.route,
             arguments = listOf(
                 navArgument("tagName") { type = NavType.StringType },
-                navArgument("tagCount") { type = NavType.IntType }
             ),
             enterTransition = {
                 fadeIn(animationSpec = tween(400))
@@ -178,10 +176,8 @@ fun RemakApp(
             },
         ) { backStackEntry ->
             val tagName = backStackEntry.arguments?.getString("tagName")
-            val tagCount = backStackEntry.arguments?.getInt("tagCount")
             TagDetailScreen(
                 tagName = tagName!!,
-                tagCount = tagCount!!,
                 navController = navController,
                 viewModel = hiltViewModel()
             )
@@ -289,8 +285,10 @@ fun RemakApp(
             LinkDetailScreen(
                 navController = navController,
                 viewModel = hiltViewModel(),
-//                docIdx = docIdx
+                docIdx = docIdx,
+                collectionViewModel = hiltViewModel()
             )
+
         }
 
         composable(
@@ -310,7 +308,8 @@ fun RemakApp(
             ImageDetailScreen(
                 navController = navController,
                 viewModel = hiltViewModel(),
-//                docIdx = docIdx
+                docIdx = docIdx,
+                collectionViewModel = hiltViewModel()
             )
         }
 
@@ -349,7 +348,8 @@ fun RemakApp(
             FileDetailScreen(
                 navController = navController,
                 viewModel = hiltViewModel(),
-                docIdx = docIdx
+                docIdx = docIdx,
+                collectionViewModel = hiltViewModel()
             )
         }
 
@@ -369,7 +369,8 @@ fun RemakApp(
             MemoDetailScreen(
                 navController = navController,
                 viewModel = hiltViewModel(),
-                docIdx = docIdx
+                docIdx = docIdx,
+                collectionViewModel = hiltViewModel()
             )
         }
 

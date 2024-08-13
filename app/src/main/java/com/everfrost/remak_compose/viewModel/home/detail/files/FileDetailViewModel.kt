@@ -57,6 +57,9 @@ class FileDetailViewModel @Inject constructor(
     private val _isFileShareEnabled = MutableStateFlow(false)
     val isFileShareEnabled: StateFlow<Boolean> = _isFileShareEnabled
 
+    private val _isDeleteComplete = MutableStateFlow(false)
+    val isDeleteComplete: StateFlow<Boolean> = _isDeleteComplete
+
     fun fetchDetailData(docId: String) {
         viewModelScope.launch {
             _getDetailDataState.value = documentRepository.getDetailData(docId)
@@ -189,6 +192,15 @@ class FileDetailViewModel @Inject constructor(
         }
         Log.d("File Size", file.length().toString()) // 로그 추가
         return FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
+    }
+
+    fun deleteDocument(docId: String) {
+        viewModelScope.launch {
+            val response = documentRepository.deleteDocument(docId)
+            if (response is APIResponse.Success) {
+                _isDeleteComplete.value = true
+            }
+        }
     }
 
 

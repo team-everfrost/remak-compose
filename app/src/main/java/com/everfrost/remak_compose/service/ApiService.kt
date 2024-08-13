@@ -129,5 +129,16 @@ interface ApiService {
         @Body body: AddDataInCollectionModel.AddRequestBody
     ): retrofit2.Response<AddDataInCollectionModel.AddResponse>
 
+    //컬렉션에서 자료 삭제
+    @PATCH("collection/{name}")
+    suspend fun removeDataInCollection(
+        @Path("name") name: String,
+        @Body body: AddDataInCollectionModel.RemoveRequestBody
+    ): retrofit2.Response<AddDataInCollectionModel.RemoveResponse>
+
+    //컬렉션 삭제
+    @DELETE("collection/{name}")
+    suspend fun deleteCollection(@Path("name") name: String): retrofit2.Response<DeleteModel.ResponseBody>
+
 
 }

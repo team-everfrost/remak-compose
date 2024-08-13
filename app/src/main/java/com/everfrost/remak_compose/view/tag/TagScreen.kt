@@ -128,7 +128,7 @@ fun TagScreen(
                                     interactionSource = remember { MutableInteractionSource() },
                                     indication = null
                                 ) {
-                                    navController.navigate("TagDetail/${tagList[index].name}/${tagList[index].count}")
+                                    navController.navigate("TagDetail/${tagList[index].name}")
                                 },
                             tagName = tagList[index].name,
                             tagCount = tagList[index].count

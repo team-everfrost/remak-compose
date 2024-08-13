@@ -94,6 +94,15 @@ interface RemoteDataSource {
         name: String,
         docIds: List<String>
     ): Response<AddDataInCollectionModel.AddResponse>
+
+    //컬렉션에서 자료 삭제
+    suspend fun removeDataInCollection(
+        name: String,
+        docIds: List<String>
+    ): Response<AddDataInCollectionModel.RemoveResponse>
+
+    //컬렉션 삭제
+    suspend fun deleteCollection(name: String): Response<DeleteModel.ResponseBody>
 }
 
 class RemoteDataSourceImpl @Inject constructor(
@@ -221,5 +230,20 @@ class RemoteDataSourceImpl @Inject constructor(
         val requestBody = AddDataInCollectionModel.AddRequestBody(docIds)
         return apiService.addDataInCollection(name, requestBody)
     }
+
+    //컬렉션에서 자료 삭제
+    override suspend fun removeDataInCollection(
+        name: String,
+        docIds: List<String>
+    ): Response<AddDataInCollectionModel.RemoveResponse> {
+        val requestBody = AddDataInCollectionModel.RemoveRequestBody(docIds)
+        return apiService.removeDataInCollection(name, requestBody)
+    }
+
+    //컬렉션 삭제
+    override suspend fun deleteCollection(name: String): Response<DeleteModel.ResponseBody> {
+        return apiService.deleteCollection(name)
+    }
+
 
 }

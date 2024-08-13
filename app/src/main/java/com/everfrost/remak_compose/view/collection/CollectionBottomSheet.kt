@@ -70,7 +70,6 @@ fun CollectionBottomSheet(
 
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
-
         sheetState = sheetState,
         containerColor = white,
         modifier = Modifier
@@ -140,7 +139,6 @@ fun CollectionBottomSheet(
                     onConfirm()
                     onDismissRequest()
                 }, isEnable = isAnyChecked,
-
                 text = "확인"
             )
         }

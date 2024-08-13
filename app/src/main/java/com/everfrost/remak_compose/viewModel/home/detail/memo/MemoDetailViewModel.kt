@@ -31,7 +31,8 @@ class MemoDetailViewModel @Inject constructor(
     )
     val updateMemoState: StateFlow<APIResponse<UpdateModel.MemoResponseBody>> = _updateMemoState
 
-
+    private val _isDeleteComplete = MutableStateFlow(false)
+    val isDeleteComplete: StateFlow<Boolean> = _isDeleteComplete
     private val _isEditMode = MutableStateFlow(false)
     val isEditMode: StateFlow<Boolean> = _isEditMode
     private val _date = MutableStateFlow("")
@@ -108,6 +109,15 @@ class MemoDetailViewModel @Inject constructor(
             return lines.subList(1, lines.size).joinToString("\n")
         } else {
             return summary
+        }
+    }
+
+    fun deleteDocument(docId: String) {
+        viewModelScope.launch {
+            val response = documentRepository.deleteDocument(docId)
+            if (response is APIResponse.Success) {
+                _isDeleteComplete.value = true
+            }
         }
     }
 

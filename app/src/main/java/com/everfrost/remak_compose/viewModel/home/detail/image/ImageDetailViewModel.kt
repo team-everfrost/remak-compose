@@ -47,6 +47,9 @@ class ImageDetailViewModel @Inject constructor(
         APIResponse.Empty()
     )
 
+    private val _isDeleteComplete = MutableStateFlow(false)
+    val isDeleteComplete: StateFlow<Boolean> = _isDeleteComplete
+
     private val _date = MutableStateFlow("")
     val date: StateFlow<String> = _date
     private val _title = MutableStateFlow("")
@@ -136,7 +139,7 @@ class ImageDetailViewModel @Inject constructor(
     }
 
 
-    suspend fun downloadAndShareImage(
+    private suspend fun downloadAndShareImage(
         context: Context,
         imageUrl: String,
         fileName: String
@@ -192,6 +195,15 @@ class ImageDetailViewModel @Inject constructor(
         }
         Log.d("File Size", file.length().toString()) // 로그 추가
         return FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
+    }
+
+    fun deleteDocument(docId: String) {
+        viewModelScope.launch {
+            val response = documentRepository.deleteDocument(docId)
+            if (response is APIResponse.Success) {
+                _isDeleteComplete.value = true
+            }
+        }
     }
 
 

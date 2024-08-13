@@ -2,6 +2,7 @@ package com.everfrost.remak_compose.repository
 
 import com.everfrost.remak_compose.dataSource.RemoteDataSource
 import com.everfrost.remak_compose.model.APIResponse
+import com.everfrost.remak_compose.model.DeleteModel
 import com.everfrost.remak_compose.model.collection.AddDataInCollectionModel
 import com.everfrost.remak_compose.model.collection.CollectionListModel
 import com.everfrost.remak_compose.model.collection.CreateCollectionModel
@@ -37,6 +38,15 @@ interface CollectionRepository {
         name: String,
         docIds: List<String>
     ): APIResponse<AddDataInCollectionModel.AddResponse>
+
+    //컬렉션에서 자료 삭제
+    suspend fun removeDataInCollection(
+        name: String,
+        docIds: List<String>
+    ): APIResponse<AddDataInCollectionModel.RemoveResponse>
+
+    //컬렉션 삭제
+    suspend fun deleteCollection(name: String): APIResponse<DeleteModel.ResponseBody>
 }
 
 class CollectionRepositoryImpl(
@@ -144,6 +154,51 @@ class CollectionRepositoryImpl(
     ): APIResponse<AddDataInCollectionModel.AddResponse> {
         try {
             val response = remoteDataSource.addDataInCollection(name, docIds)
+            return if (response.isSuccessful) {
+                APIResponse.Success(data = response.body())
+            } else {
+                APIResponse.Error(
+                    message = "message: ${
+                        response.errorBody()!!.string()
+                    }",
+                    errorCode = response.code().toString()
+                )
+            }
+        } catch (e: Exception) {
+            return APIResponse.Error(
+                message = "Sign in failed: ${e.message}",
+                errorCode = "500"
+            )
+        }
+    }
+
+    override suspend fun removeDataInCollection(
+        name: String,
+        docIds: List<String>
+    ): APIResponse<AddDataInCollectionModel.RemoveResponse> {
+        try {
+            val response = remoteDataSource.removeDataInCollection(name, docIds)
+            return if (response.isSuccessful) {
+                APIResponse.Success(data = response.body())
+            } else {
+                APIResponse.Error(
+                    message = "message: ${
+                        response.errorBody()!!.string()
+                    }",
+                    errorCode = response.code().toString()
+                )
+            }
+        } catch (e: Exception) {
+            return APIResponse.Error(
+                message = "Sign in failed: ${e.message}",
+                errorCode = "500"
+            )
+        }
+    }
+
+    override suspend fun deleteCollection(name: String): APIResponse<DeleteModel.ResponseBody> {
+        try {
+            val response = remoteDataSource.deleteCollection(name)
             return if (response.isSuccessful) {
                 APIResponse.Success(data = response.body())
             } else {

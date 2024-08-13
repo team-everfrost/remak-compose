@@ -39,6 +39,9 @@ class TagViewModel @Inject constructor(
     private val _isInit = MutableStateFlow(false)
     val isInit: StateFlow<Boolean> = _isInit
 
+    private val _tagCount = MutableStateFlow(0)
+    val tagCount: StateFlow<Int> = _tagCount
+
     private var offset: Int = 0
 
     private var cursor: String? = null
@@ -86,6 +89,8 @@ class TagViewModel @Inject constructor(
             _tagDetailListState.value =
                 tagRepository.getTagDetailData(tagName, cursor = null, docId = null)
             if (_tagDetailListState.value is APIResponse.Success) {
+                _tagCount.value =
+                    (_tagDetailListState.value as APIResponse.Success).data!!.data.size
                 if ((_tagDetailListState.value as APIResponse.Success).data!!.data.isEmpty()) {
                     _isDataEnd.value = true
                     return@launch

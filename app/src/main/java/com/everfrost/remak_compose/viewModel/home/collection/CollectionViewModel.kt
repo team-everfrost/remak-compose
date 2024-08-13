@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.everfrost.remak_compose.model.APIResponse
+import com.everfrost.remak_compose.model.DeleteModel
 import com.everfrost.remak_compose.model.collection.AddDataInCollectionModel
 import com.everfrost.remak_compose.model.collection.CollectionListModel
 import com.everfrost.remak_compose.model.collection.CreateCollectionModel
@@ -60,6 +61,20 @@ class CollectionViewModel @Inject constructor(
     val addDataInCollectionState: StateFlow<APIResponse<AddDataInCollectionModel.AddResponse>> =
         _addDataInCollectionState
 
+    private val _removeDataInCollectionState =
+        MutableStateFlow<APIResponse<AddDataInCollectionModel.RemoveResponse>>(
+            APIResponse.Empty()
+        )
+    val removeDataInCollectionState: StateFlow<APIResponse<AddDataInCollectionModel.RemoveResponse>> =
+        _removeDataInCollectionState
+
+    private val _deleteCollectionState =
+        MutableStateFlow<APIResponse<DeleteModel.ResponseBody>>(
+            APIResponse.Empty()
+        )
+    val deleteCollectionState: StateFlow<APIResponse<DeleteModel.ResponseBody>> =
+        _deleteCollectionState
+
     private val _collectionName = MutableStateFlow("")
     val collectionName: StateFlow<String> = _collectionName
     private val _collectionDescription = MutableStateFlow("")
@@ -113,7 +128,6 @@ class CollectionViewModel @Inject constructor(
 
     fun fetchCollectionDetailList(collectionName: String) {
         if (isDataEnd.value) return
-        _collectionDetailListState.value = APIResponse.Loading()
         viewModelScope.launch {
             _collectionDetailListState.value =
                 collectionRepository.getCollectionDetailList(collectionName, cursor, docId)
@@ -160,7 +174,6 @@ class CollectionViewModel @Inject constructor(
             }
         }
     }
-
 
     fun resetCollectionDetailList() {
         _collectionDetailList.value = emptyList()
@@ -215,17 +228,38 @@ class CollectionViewModel @Inject constructor(
             for (item in collectionName) {
                 _addDataInCollectionState.value =
                     collectionRepository.addDataInCollection(item, docIds)
-
             }
             _isActionComplete.value = true
-
-
         }
+    }
+
+    fun deleteCollection(name: String) {
+        viewModelScope.launch {
+            _deleteCollectionState.value = collectionRepository.deleteCollection(name)
+            if (_deleteCollectionState.value is APIResponse.Success) {
+                _isActionComplete.value = true
+            } else {
+                Log.d("CollectionViewModel", "deleteCollection: ${_deleteCollectionState.value}")
+            }
+        }
+    }
+
+    fun removeDataInCollection(collectionName: String) {
+        val docIds = getSelectedDocuments()
+        viewModelScope.launch {
+            _removeDataInCollectionState.value =
+                collectionRepository.removeDataInCollection(collectionName, docIds)
+            _isActionComplete.value = true
+        }
+
+    }
+
+    private fun getSelectedDocuments(): List<String> {
+        return _collectionDetailList.value.filter { it.isSelected }.map { it.docId!! }
     }
 
     private fun getSelectedCollections(): List<String> {
         return _collectionList.value.filter { it.isSelected }.map { it.name }
     }
-
 
 }

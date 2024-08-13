@@ -1,37 +1,43 @@
 package com.everfrost.remak_compose.view.home.detail.link
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.util.Log
+import android.webkit.URLUtil
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
@@ -46,21 +52,30 @@ import com.everfrost.remak_compose.ui.theme.bgGray4
 import com.everfrost.remak_compose.ui.theme.black1
 import com.everfrost.remak_compose.ui.theme.black3
 import com.everfrost.remak_compose.ui.theme.pretendard
-import com.everfrost.remak_compose.ui.theme.strokeGray2
+import com.everfrost.remak_compose.ui.theme.red1
 import com.everfrost.remak_compose.ui.theme.white
+import com.everfrost.remak_compose.view.collection.CollectionBottomSheet
 import com.everfrost.remak_compose.view.common.appbar.DetailAppBar
 import com.everfrost.remak_compose.view.common.button.PrimaryButton
+import com.everfrost.remak_compose.view.common.dialog.CustomImageDialog
+import com.everfrost.remak_compose.view.common.dialog.CustomSelectDialog
 import com.everfrost.remak_compose.view.common.layout.TagRowLayout
 import com.everfrost.remak_compose.view.home.detail.SummaryBoxWidget
+import com.everfrost.remak_compose.viewModel.home.collection.CollectionViewModel
 import com.everfrost.remak_compose.viewModel.home.detail.link.LinkDetailViewModel
+import kotlinx.coroutines.launch
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LinkDetailScreen(
-    docIdx: String? = "11a6258e-c933-4d6d-bde5-e65b2a389734",
+    docIdx: String?,
     navController: NavController,
-    viewModel: LinkDetailViewModel
+    viewModel: LinkDetailViewModel,
+    collectionViewModel: CollectionViewModel
 ) {
+
+    val scope = rememberCoroutineScope()
     val getDetailDataState by viewModel.getDetailDataState.collectAsState()
     val linkData by viewModel.linkData.collectAsState()
     val date by viewModel.date.collectAsState()
@@ -69,15 +84,25 @@ fun LinkDetailScreen(
     val summary by viewModel.summary.collectAsState()
     val url by viewModel.url.collectAsState()
     val scrollState = rememberScrollState()
+    val isDeleteComplete by viewModel.isDeleteComplete.collectAsState()
     val hasScrolled by remember {
         derivedStateOf { scrollState.value > 0 }
     }
+    var collectionBottomSheet by remember {
+        mutableStateOf(false)
+    }
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = false,
+    )
     val isDataLoaded by viewModel.isDataLoaded.collectAsState()
     val context = LocalContext.current
+    var deleteDialog by remember { mutableStateOf(false) }
+    var imageDialog by remember { mutableStateOf(false) }
+    var imageUrl by remember { mutableStateOf("") }
 
 
     val webView = remember(linkData) {
-        if (!linkData.isNullOrEmpty()) {
+        if (linkData.isNotEmpty()) {
             WebView(context).apply {
                 setupWebView()
                 webViewClient = object : WebViewClient() {
@@ -107,40 +132,75 @@ fun LinkDetailScreen(
                     if (hitTestResult.type == WebView.HitTestResult.IMAGE_TYPE ||
                         hitTestResult.type == WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE
                     ) {
-                        val imageUrl = hitTestResult.extra!!
-                        val fileName = hitTestResult.extra!!.substringAfterLast("/")
-                        Log.d("fileName", fileName)
+                        imageUrl = hitTestResult.extra!!
+                        Log.d("imageUrl", imageUrl)
                         // Todo : 이미지 다운로드 및 공유 기능 추가
-//                        UtilityDialog.showImageDialog(
-//                            context,
-//                            downloadBtnClick = {
-//                                downloadImage(imageUrl)
-//                            },
-//                            shareBtnClick = {
-//                                lifecycleScope.launch {
-//                                    viewModel.downloadAndShareImage(context, imageUrl, fileName)
-//                                }
-//                            },
-//                            selfShareBtnClick = {
-//                                lifecycleScope.launch {
-//                                    viewModel.shareSelf(context, imageUrl, fileName)
-//                                }
-//
-//                            }
-//                        )
+                        imageDialog = true
                     }
                     false
-
                 }
             }
         } else {
-            null // linkData가 비어 있을 경우 null 반환
+            null
         }
     }
 
 
     LaunchedEffect(true) {
         viewModel.fetchDetailData(docIdx!!)
+    }
+
+    LaunchedEffect(isDeleteComplete) {
+        if (isDeleteComplete) {
+            navController.previousBackStackEntry?.savedStateHandle?.set(
+                "isUpdate",
+                true
+            )
+            navController.popBackStack()
+        }
+    }
+
+
+    when {
+        deleteDialog ->
+            CustomSelectDialog(
+                onDismissRequest = {
+                    deleteDialog = false
+                },
+                onConfirm = {
+                    viewModel.deleteDocument(docIdx!!)
+                    deleteDialog = false
+                },
+                mainTitle = "링크를 삭제하시겠습니까?",
+                subTitle = "삭제시 복구가 불가능해요",
+                confirmBtnText = "삭제하기",
+                cancelBtnText = "취소하기"
+            )
+    }
+
+    when {
+        imageDialog ->
+            CustomImageDialog(
+                onDismissRequest = {
+                    imageDialog = false
+                },
+                onDownloadClick = {
+                    viewModel.downloadImage(imageUrl, context)
+                    imageDialog = false
+                },
+                onSelfShareClick = { /*TODO*/ },
+                onOtherShareClick = {
+                    scope.launch {
+                        viewModel.downloadAndShareImage(
+                            context,
+                            imageUrl,
+                            URLUtil.guessFileName(imageUrl, null, null)
+                        )
+                    }
+                    imageDialog = false
+                },
+            )
+
     }
     Scaffold(
         modifier = Modifier
@@ -149,16 +209,16 @@ fun LinkDetailScreen(
         topBar = {
             DetailAppBar(
                 hasScrolled = hasScrolled,
-                backClick = { /*TODO*/ },
+                backClick = { navController.popBackStack() },
                 title = "링크",
                 isShareEnable = false,
                 shareClick = { },
-                dropDownMenuContent = {
+                dropDownMenuContent = { dismissMenu ->
                     DropdownMenuItem(
                         modifier = Modifier.height(40.dp),
                         text = {
                             Text(
-                                "편집하기", style = TextStyle(
+                                "컬렉션에 추가", style = TextStyle(
                                     color = black1,
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Medium,
@@ -167,12 +227,91 @@ fun LinkDetailScreen(
                             )
                         },
                         onClick = {
+                            dismissMenu()
+                            collectionBottomSheet = true
+
+                        }
+                    )
+                    DropdownMenuItem(
+                        modifier = Modifier.height(40.dp),
+                        text = {
+                            Text(
+                                "공유", style = TextStyle(
+                                    color = black1,
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    fontFamily = pretendard
+                                )
+                            )
+                        },
+
+                        onClick = {
+                            val shareIntent = Intent().apply {
+                                action = Intent.ACTION_SEND
+                                putExtra(Intent.EXTRA_TEXT, url)
+                                type = "text/plain"
+                            }
+                            context.startActivity(
+                                Intent.createChooser(shareIntent, "링크 공유하기")
+                            )
+
+                        }
+                    )
+                    DropdownMenuItem(
+                        modifier = Modifier.height(40.dp),
+                        text = {
+                            Text(
+                                "브라우저 보기", style = TextStyle(
+                                    color = black1,
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    fontFamily = pretendard
+                                )
+                            )
+                        },
+                        onClick = {
+                            val i = Intent(Intent.ACTION_VIEW)
+                            i.data = Uri.parse(url)
+                            context.startActivity(i)
+                            dismissMenu()
+                        }
+                    )
+                    DropdownMenuItem(
+                        modifier = Modifier.height(40.dp),
+                        text = {
+                            Text(
+                                "삭제", style = TextStyle(
+                                    color = red1,
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    fontFamily = pretendard
+                                )
+                            )
+                        },
+                        onClick = {
+                            deleteDialog = true
+                            dismissMenu()
                         }
                     )
                 }
             )
         },
     ) { innerPadding ->
+        if (collectionBottomSheet) {
+            CollectionBottomSheet(
+                onDismissRequest = {
+                    scope.launch {
+                        sheetState.hide()
+                    }.invokeOnCompletion {
+                        collectionBottomSheet = false
+                    }
+                }, sheetState =
+                sheetState,
+                collectionViewModel,
+                listOf(docIdx!!),
+                onConfirm = {}
+            )
+        }
         Box(
             modifier = Modifier
                 .padding(innerPadding)
@@ -214,14 +353,23 @@ fun LinkDetailScreen(
                             color = black1,
                             fontWeight = FontWeight.Bold
                         ),
-                        modifier = Modifier.padding(top = 12.dp)
+                        modifier = Modifier
+                            .padding(top = 12.dp)
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null
+                            ) {
+                                browserView(context, url)
+                            }
                     )
 
 
                     TagRowLayout(
                         modifier = Modifier.padding(top = 24.dp),
                         tags = tagList,
-                        onClick = { }
+                        onClick = {
+                            navController.navigate("TagDetail/${tagList[it]}")
+                        }
                     )
 
                     Text(
@@ -237,12 +385,13 @@ fun LinkDetailScreen(
 
                     Box(modifier = Modifier.height(16.dp))
 
-                    AndroidView(
-                        factory = {
-                            webView!!
-                        },
-
+                    if (webView != null) {
+                        AndroidView(
+                            factory = {
+                                webView
+                            },
                         )
+                    }
 
                     PrimaryButton(
                         modifier = Modifier
@@ -328,4 +477,18 @@ th, td {
     """.trimIndent()
     loadDataWithBaseURL(null, htmlData, "text/html", "utf-8", null)
 }
+
+private fun browserView(
+    context: Context,
+    url: String
+) {
+    val colorSchemeParams = CustomTabColorSchemeParams.Builder()
+        .setToolbarColor(ContextCompat.getColor(context, R.color.black))
+        .build()
+    val customTabsIntent = CustomTabsIntent.Builder()
+        .setDefaultColorSchemeParams(colorSchemeParams)
+        .build()
+    customTabsIntent.launchUrl(context, Uri.parse(url))
+}
+
 

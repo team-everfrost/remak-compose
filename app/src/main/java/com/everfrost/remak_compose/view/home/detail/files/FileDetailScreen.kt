@@ -8,19 +8,24 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -36,32 +41,78 @@ import com.everfrost.remak_compose.ui.theme.bgGray2
 import com.everfrost.remak_compose.ui.theme.black1
 import com.everfrost.remak_compose.ui.theme.black3
 import com.everfrost.remak_compose.ui.theme.pretendard
+import com.everfrost.remak_compose.ui.theme.red1
 import com.everfrost.remak_compose.ui.theme.strokeGray2
 import com.everfrost.remak_compose.ui.theme.white
+import com.everfrost.remak_compose.view.collection.CollectionBottomSheet
 import com.everfrost.remak_compose.view.common.appbar.DetailAppBar
 import com.everfrost.remak_compose.view.common.button.PrimaryButton
+import com.everfrost.remak_compose.view.common.dialog.CustomSelectDialog
 import com.everfrost.remak_compose.view.common.layout.TagRowLayout
 import com.everfrost.remak_compose.view.home.detail.SummaryBoxWidget
+import com.everfrost.remak_compose.viewModel.home.collection.CollectionViewModel
 import com.everfrost.remak_compose.viewModel.home.detail.files.FileDetailViewModel
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FileDetailScreen(
     navController: NavController,
     viewModel: FileDetailViewModel,
-    docIdx: String?
+    docIdx: String?,
+    collectionViewModel: CollectionViewModel
 
 ) {
+    val scope = rememberCoroutineScope()
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = false,
+    )
     val scrollState = rememberScrollState()
     val getDetailDataState by viewModel.getDetailDataState.collectAsState()
     val date by viewModel.date.collectAsState()
     val title by viewModel.title.collectAsState()
     val summary by viewModel.summary.collectAsState()
     val tagList by viewModel.tagList.collectAsState()
+    val isDeleteComplete by viewModel.isDeleteComplete.collectAsState()
+    var deleteDialog by remember {
+        mutableStateOf(false)
+    }
+    var collectionBottomSheet by remember {
+        mutableStateOf(false)
+    }
 
     LaunchedEffect(true) {
         viewModel.fetchDetailData(docIdx!!)
     }
     val context = LocalContext.current
+
+    when {
+        deleteDialog ->
+            CustomSelectDialog(
+                onDismissRequest = {
+                    deleteDialog = false
+                },
+                onConfirm = {
+                    viewModel.deleteDocument(docIdx!!)
+                    deleteDialog = false
+                },
+                mainTitle = "파일을 삭제하시겠습니까?",
+                subTitle = "삭제시 복구가 불가능해요",
+                confirmBtnText = "삭제하기",
+                cancelBtnText = "취소하기"
+            )
+
+    }
+
+    LaunchedEffect(isDeleteComplete) {
+        if (isDeleteComplete) {
+            navController.previousBackStackEntry?.savedStateHandle?.set(
+                "isUpdate",
+                true
+            )
+            navController.popBackStack()
+        }
+    }
 
     Scaffold(
         modifier = Modifier
@@ -73,12 +124,12 @@ fun FileDetailScreen(
                 title = "파일",
                 isShareEnable = true,
                 shareClick = { viewModel.shareFile(context) },
-                dropDownMenuContent = {
+                dropDownMenuContent = { dismissMenu ->
                     DropdownMenuItem(
                         modifier = Modifier.height(40.dp),
                         text = {
                             Text(
-                                "편집하기", style = TextStyle(
+                                "컬렉션에 추가", style = TextStyle(
                                     color = black1,
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Medium,
@@ -87,6 +138,25 @@ fun FileDetailScreen(
                             )
                         },
                         onClick = {
+                            dismissMenu()
+                            collectionBottomSheet = true
+                        }
+                    )
+                    DropdownMenuItem(
+                        modifier = Modifier.height(40.dp),
+                        text = {
+                            Text(
+                                "삭제", style = TextStyle(
+                                    color = red1,
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    fontFamily = pretendard
+                                )
+                            )
+                        },
+                        onClick = {
+                            deleteDialog = true
+                            dismissMenu()
                         }
                     )
                 }
@@ -106,6 +176,21 @@ fun FileDetailScreen(
                 )
         }
     ) { innerPadding ->
+        if (collectionBottomSheet) {
+            CollectionBottomSheet(
+                onDismissRequest = {
+                    scope.launch {
+                        sheetState.hide()
+                    }.invokeOnCompletion {
+                        collectionBottomSheet = false
+                    }
+                }, sheetState =
+                sheetState,
+                collectionViewModel,
+                listOf(docIdx!!),
+                onConfirm = {}
+            )
+        }
         Box(
             modifier = Modifier
                 .padding(innerPadding)

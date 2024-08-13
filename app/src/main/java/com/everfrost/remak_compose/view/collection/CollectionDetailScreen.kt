@@ -1,6 +1,7 @@
 package com.everfrost.remak_compose.view.collection
 
 import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -33,6 +34,8 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -41,7 +44,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.everfrost.remak_compose.R
 import com.everfrost.remak_compose.model.APIResponse
-import com.everfrost.remak_compose.ui.theme.bgBlueGray1
 import com.everfrost.remak_compose.ui.theme.bgGray2
 import com.everfrost.remak_compose.ui.theme.bgRed3
 import com.everfrost.remak_compose.ui.theme.black1
@@ -49,14 +51,13 @@ import com.everfrost.remak_compose.ui.theme.pretendard
 import com.everfrost.remak_compose.ui.theme.red1
 import com.everfrost.remak_compose.ui.theme.strokeGray2
 import com.everfrost.remak_compose.ui.theme.textBlack3
-import com.everfrost.remak_compose.ui.theme.white
 import com.everfrost.remak_compose.view.common.appbar.DetailAppBar
 import com.everfrost.remak_compose.view.common.button.GrayButton
+import com.everfrost.remak_compose.view.common.dialog.CustomSelectDialog
 import com.everfrost.remak_compose.view.common.layout.FileLayout
 import com.everfrost.remak_compose.view.common.layout.ImageLayout
 import com.everfrost.remak_compose.view.common.layout.LinkLayout
 import com.everfrost.remak_compose.view.common.layout.MemoLayout
-import com.everfrost.remak_compose.view.home.main.AddDataButton
 import com.everfrost.remak_compose.viewModel.home.collection.CollectionViewModel
 import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.coroutines.flow.debounce
@@ -74,13 +75,21 @@ fun CollectionDetailScreen(
     val collectionDetailListState by viewModel.collectionDetailListState.collectAsState()
     val isEditMode by viewModel.isEditMode.collectAsState()
     val selectCount by viewModel.selectCount.collectAsState()
-
+    val haptics = LocalHapticFeedback.current
+    val isCollectionDeleteComplete by viewModel.isActionComplete.collectAsState()
     var collectionTitleName by remember {
         mutableStateOf(collectionName)
     }
     val resultState = remember {
         navController.currentBackStackEntry?.savedStateHandle?.getLiveData<String>("isUpdate")
     }
+    var deleteDocumentDialog by remember {
+        mutableStateOf(false)
+    }
+    var deleteCollectionDialog by remember {
+        mutableStateOf(false)
+    }
+
     LaunchedEffect(resultState) {
         collectionTitleName = resultState?.value ?: collectionName
     }
@@ -97,6 +106,57 @@ fun CollectionDetailScreen(
 
     LaunchedEffect(true) {
         viewModel.fetchCollectionDetailList(collectionName)
+    }
+
+    LaunchedEffect(isCollectionDeleteComplete) {
+        if (isCollectionDeleteComplete == true) {
+            navController.popBackStack()
+        }
+
+    }
+
+    BackHandler {
+        if (isEditMode) {
+            viewModel.toggleEditMode()
+        } else {
+            navController.popBackStack()
+        }
+    }
+
+    when {
+        deleteDocumentDialog ->
+            CustomSelectDialog(
+                onDismissRequest = { deleteDocumentDialog = false },
+                onConfirm = {
+                    viewModel.removeDataInCollection(collectionName)
+                    deleteDocumentDialog = false
+                    viewModel.toggleEditMode()
+                    viewModel.resetCollectionDetailList()
+                    viewModel.fetchCollectionDetailList(collectionName)
+
+                },
+                mainTitle = "${selectCount}개의 자료를 삭제하시겠어요?",
+                subTitle = "나중에 다시 추가할 수 있어요",
+                confirmBtnText = "삭제하기",
+                cancelBtnText = "취소하기"
+            )
+    }
+
+    when {
+        deleteCollectionDialog ->
+            CustomSelectDialog(
+                onDismissRequest = { deleteCollectionDialog = false },
+                onConfirm = {
+                    viewModel.deleteCollection(collectionName)
+                    deleteCollectionDialog = false
+
+                },
+                mainTitle = "컬렉션을 삭제하시겠어요?",
+                subTitle = "삭제 시 복구가 불가능해요",
+                confirmBtnText = "삭제하기",
+                cancelBtnText = "취소하기"
+            )
+
     }
     Scaffold(
         containerColor = bgGray2,
@@ -139,6 +199,8 @@ fun CollectionDetailScreen(
                             )
                         },
                         onClick = {
+                            dismissMenu()
+                            deleteCollectionDialog = true
                         }
                     )
 
@@ -157,6 +219,7 @@ fun CollectionDetailScreen(
         ) {
             if (collectionDetailListState is APIResponse.Success) {
                 if (collectionDetailList.isNotEmpty()) {
+
                     Column {
                         Row(
                             modifier = Modifier.fillMaxWidth()
@@ -194,7 +257,10 @@ fun CollectionDetailScreen(
                                             fontSize = 14.sp,
                                             fontFamily = pretendard,
                                             fontWeight = FontWeight.Medium
-                                        )
+                                        ),
+                                        modifier = Modifier.clickable {
+                                            deleteDocumentDialog = true
+                                        }
                                     )
                                 }
                                 Box(
@@ -278,6 +344,13 @@ fun CollectionDetailScreen(
                                             }
                                         },
                                         onLongTab = {
+                                            if (!isEditMode) {
+                                                haptics.performHapticFeedback(
+                                                    HapticFeedbackType.LongPress
+                                                )
+                                                viewModel.toggleEditMode()
+                                                viewModel.toggleSelect(index)
+                                            }
                                         }
 
                                     )
@@ -302,6 +375,13 @@ fun CollectionDetailScreen(
                                             }
                                         },
                                         onLongTab = {
+                                            if (!isEditMode) {
+                                                haptics.performHapticFeedback(
+                                                    HapticFeedbackType.LongPress
+                                                )
+                                                viewModel.toggleEditMode()
+                                                viewModel.toggleSelect(index)
+                                            }
                                         }
 
                                     )
@@ -327,7 +407,13 @@ fun CollectionDetailScreen(
                                             }
                                         },
                                         onLongTab = {
-
+                                            if (!isEditMode) {
+                                                haptics.performHapticFeedback(
+                                                    HapticFeedbackType.LongPress
+                                                )
+                                                viewModel.toggleEditMode()
+                                                viewModel.toggleSelect(index)
+                                            }
                                         }
                                     )
 
@@ -354,7 +440,13 @@ fun CollectionDetailScreen(
                                                 }
                                             },
                                             onLongTab = {
-
+                                                if (!isEditMode) {
+                                                    haptics.performHapticFeedback(
+                                                        HapticFeedbackType.LongPress
+                                                    )
+                                                    viewModel.toggleEditMode()
+                                                    viewModel.toggleSelect(index)
+                                                }
                                             }
 
                                         )
@@ -396,8 +488,7 @@ fun CollectionDetailScreen(
 
             }
         }
-
-
     }
+
 
 }

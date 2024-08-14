@@ -27,7 +27,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import com.everfrost.remak_compose.R
 import com.everfrost.remak_compose.model.APIResponse
@@ -38,7 +37,7 @@ import com.everfrost.remak_compose.view.BottomNav
 import com.everfrost.remak_compose.view.RemakScreen
 import com.everfrost.remak_compose.view.common.button.GrayButton
 import com.everfrost.remak_compose.view.home.main.AddDataButton
-import com.everfrost.remak_compose.viewModel.home.collection.CollectionViewModel
+import com.everfrost.remak_compose.viewModel.collection.CollectionViewModel
 import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
@@ -55,7 +54,6 @@ fun CollectionScreen(
         true
     ) {
         viewModel.fetchCollectionList()
-
     }
 
     Scaffold(
@@ -161,7 +159,9 @@ fun CollectionScreen(
                                     .width(148.dp)
                                     .height(40.dp)
                                     .align(Alignment.CenterHorizontally),
-                                onClick = { /*TODO*/ },
+                                onClick = {
+                                    navController.navigate(RemakScreen.AddCollection.route)
+                                },
                                 title = "새 컬렉션 만들기",
                                 textStyle = TextStyle(
                                     fontFamily = pretendard,

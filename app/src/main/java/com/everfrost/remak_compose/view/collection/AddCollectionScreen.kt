@@ -34,7 +34,7 @@ import com.everfrost.remak_compose.view.account.widget.textfield.CollectionTextF
 import com.everfrost.remak_compose.view.common.appbar.BackTitleAppBar
 import com.everfrost.remak_compose.view.common.button.PrimaryButton
 import com.everfrost.remak_compose.view.common.dialog.CustomConfirmDialog
-import com.everfrost.remak_compose.viewModel.home.collection.CollectionViewModel
+import com.everfrost.remak_compose.viewModel.collection.CollectionViewModel
 
 
 @Composable

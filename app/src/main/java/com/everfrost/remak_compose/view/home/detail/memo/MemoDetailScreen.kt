@@ -39,7 +39,7 @@ import com.everfrost.remak_compose.view.collection.CollectionBottomSheet
 import com.everfrost.remak_compose.view.common.appbar.DetailAppBar
 import com.everfrost.remak_compose.view.common.dialog.CustomSelectDialog
 import com.everfrost.remak_compose.view.common.textField.RoundGrayTextField
-import com.everfrost.remak_compose.viewModel.home.collection.CollectionViewModel
+import com.everfrost.remak_compose.viewModel.collection.CollectionViewModel
 import com.everfrost.remak_compose.viewModel.home.detail.memo.MemoDetailViewModel
 import kotlinx.coroutines.launch
 

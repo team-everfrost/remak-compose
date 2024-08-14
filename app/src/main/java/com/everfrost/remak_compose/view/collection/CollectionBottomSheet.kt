@@ -44,8 +44,8 @@ import com.everfrost.remak_compose.ui.theme.black2
 import com.everfrost.remak_compose.ui.theme.pretendard
 import com.everfrost.remak_compose.ui.theme.white
 import com.everfrost.remak_compose.view.common.button.PrimaryButton
-import com.everfrost.remak_compose.viewModel.home.collection.CollectionViewModel
-import com.everfrost.remak_compose.viewModel.home.tag.TagViewModel
+import com.everfrost.remak_compose.viewModel.collection.CollectionViewModel
+import com.everfrost.remak_compose.viewModel.tag.TagViewModel
 import com.skydoves.landscapist.glide.GlideImage
 
 

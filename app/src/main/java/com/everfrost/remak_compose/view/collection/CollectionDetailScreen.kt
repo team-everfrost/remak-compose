@@ -58,7 +58,7 @@ import com.everfrost.remak_compose.view.common.layout.FileLayout
 import com.everfrost.remak_compose.view.common.layout.ImageLayout
 import com.everfrost.remak_compose.view.common.layout.LinkLayout
 import com.everfrost.remak_compose.view.common.layout.MemoLayout
-import com.everfrost.remak_compose.viewModel.home.collection.CollectionViewModel
+import com.everfrost.remak_compose.viewModel.collection.CollectionViewModel
 import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.coroutines.flow.debounce
 

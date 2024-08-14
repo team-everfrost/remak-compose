@@ -1,4 +1,4 @@
-package com.everfrost.remak_compose.viewModel.home.collection
+package com.everfrost.remak_compose.viewModel.collection
 
 import android.util.Log
 import androidx.lifecycle.ViewModel

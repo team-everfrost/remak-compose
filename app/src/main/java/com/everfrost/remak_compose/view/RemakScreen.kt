@@ -265,7 +265,8 @@ fun RemakApp(
         ) {
             // MainScreen(navController = navController)
             ProfileScreen(
-                navController = navController
+                navController = navController,
+                viewModel = hiltViewModel()
             )
         }
 

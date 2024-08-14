@@ -1,4 +1,4 @@
-package com.everfrost.remak_compose.viewModel.home.tag
+package com.everfrost.remak_compose.viewModel.tag
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

@@ -24,7 +24,7 @@ import com.everfrost.remak_compose.view.common.layout.FileLayout
 import com.everfrost.remak_compose.view.common.layout.ImageLayout
 import com.everfrost.remak_compose.view.common.layout.LinkLayout
 import com.everfrost.remak_compose.view.common.layout.MemoLayout
-import com.everfrost.remak_compose.viewModel.home.tag.TagViewModel
+import com.everfrost.remak_compose.viewModel.tag.TagViewModel
 import kotlinx.coroutines.flow.debounce
 
 

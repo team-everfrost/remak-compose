@@ -10,6 +10,7 @@ import com.everfrost.remak_compose.model.home.detail.UpdateModel
 import com.everfrost.remak_compose.model.home.file.DownloadModel
 import com.everfrost.remak_compose.model.home.file.UploadFileModel
 import com.everfrost.remak_compose.model.home.main.MainListModel
+import com.everfrost.remak_compose.model.profile.UserModel
 import com.everfrost.remak_compose.model.tag.TagListModel
 import okhttp3.MultipartBody
 import retrofit2.http.Body
@@ -32,6 +33,18 @@ interface ApiService {
     //로그인
     @POST("auth/local/login")
     suspend fun signIn(@Body body: SignInModel.RequestBody): retrofit2.Response<SignInModel.ResponseBody>
+
+    //프로필 정보
+    @GET("user")
+    suspend fun getUserData(): retrofit2.Response<UserModel.Response>
+
+    //최대 공간
+    @GET("user/storage/size")
+    suspend fun getStorageSize(): retrofit2.Response<UserModel.StorageData>
+
+    //사용량
+    @GET("user/storage/usage")
+    suspend fun getStorageUsage(): retrofit2.Response<UserModel.StorageData>
 
     //home ---------------------------------------------------------
     //메인 리스트

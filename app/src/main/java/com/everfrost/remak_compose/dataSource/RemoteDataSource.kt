@@ -10,6 +10,7 @@ import com.everfrost.remak_compose.model.home.detail.UpdateModel
 import com.everfrost.remak_compose.model.home.file.DownloadModel
 import com.everfrost.remak_compose.model.home.file.UploadFileModel
 import com.everfrost.remak_compose.model.home.main.MainListModel
+import com.everfrost.remak_compose.model.profile.UserModel
 import com.everfrost.remak_compose.model.tag.TagListModel
 import com.everfrost.remak_compose.service.ApiService
 import okhttp3.MultipartBody
@@ -21,6 +22,10 @@ interface RemoteDataSource {
     //account--------------------------------------------------------------------------------------------
     suspend fun checkEmail(email: String): Response<SignInModel.CheckEmailResponse>
     suspend fun signIn(email: String, password: String): Response<SignInModel.ResponseBody>
+
+    suspend fun getUserData(): Response<UserModel.Response>
+    suspend fun getStorageSize(): Response<UserModel.StorageData>
+    suspend fun getStorageUsage(): Response<UserModel.StorageData>
 
     //home--------------------------------------------------------------------------------------------
     suspend fun getMainList(cursor: String?, docID: String?): Response<MainListModel.Response>
@@ -120,6 +125,18 @@ class RemoteDataSourceImpl @Inject constructor(
     ): Response<SignInModel.ResponseBody> {
         val requestBody = SignInModel.RequestBody(email = email, password = password)
         return apiService.signIn(requestBody)
+    }
+
+    override suspend fun getUserData(): Response<UserModel.Response> {
+        return apiService.getUserData()
+    }
+
+    override suspend fun getStorageSize(): Response<UserModel.StorageData> {
+        return apiService.getStorageSize()
+    }
+
+    override suspend fun getStorageUsage(): Response<UserModel.StorageData> {
+        return apiService.getStorageUsage()
     }
 
     //home--------------------------------------------------------------------------------------------

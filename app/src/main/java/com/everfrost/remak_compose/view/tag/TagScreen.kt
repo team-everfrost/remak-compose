@@ -35,7 +35,7 @@ import com.everfrost.remak_compose.ui.theme.bgGray2
 import com.everfrost.remak_compose.ui.theme.pretendard
 import com.everfrost.remak_compose.view.BottomNav
 import com.everfrost.remak_compose.view.tag.TagListItem
-import com.everfrost.remak_compose.viewModel.home.tag.TagViewModel
+import com.everfrost.remak_compose.viewModel.tag.TagViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.debounce

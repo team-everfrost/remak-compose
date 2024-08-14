@@ -61,7 +61,7 @@ import com.everfrost.remak_compose.view.common.dialog.CustomImageDialog
 import com.everfrost.remak_compose.view.common.dialog.CustomSelectDialog
 import com.everfrost.remak_compose.view.common.layout.TagRowLayout
 import com.everfrost.remak_compose.view.home.detail.SummaryBoxWidget
-import com.everfrost.remak_compose.viewModel.home.collection.CollectionViewModel
+import com.everfrost.remak_compose.viewModel.collection.CollectionViewModel
 import com.everfrost.remak_compose.viewModel.home.detail.link.LinkDetailViewModel
 import kotlinx.coroutines.launch
 
@@ -134,7 +134,6 @@ fun LinkDetailScreen(
                     ) {
                         imageUrl = hitTestResult.extra!!
                         Log.d("imageUrl", imageUrl)
-                        // Todo : 이미지 다운로드 및 공유 기능 추가
                         imageDialog = true
                     }
                     false

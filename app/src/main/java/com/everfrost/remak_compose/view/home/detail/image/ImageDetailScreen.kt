@@ -50,7 +50,7 @@ import com.everfrost.remak_compose.view.common.button.PrimaryButton
 import com.everfrost.remak_compose.view.common.dialog.CustomSelectDialog
 import com.everfrost.remak_compose.view.common.layout.TagRowLayout
 import com.everfrost.remak_compose.view.home.detail.SummaryBoxWidget
-import com.everfrost.remak_compose.viewModel.home.collection.CollectionViewModel
+import com.everfrost.remak_compose.viewModel.collection.CollectionViewModel
 import com.everfrost.remak_compose.viewModel.home.detail.image.ImageDetailViewModel
 import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.coroutines.launch
@@ -120,7 +120,9 @@ fun ImageDetailScreen(
         containerColor = white,
         topBar = {
             DetailAppBar(
-                backClick = { /*TODO*/ },
+                backClick = {
+                    navController.popBackStack()
+                },
                 title = "이미지",
                 isShareEnable = true,
                 shareClick = { viewModel.shareFile(context) },
@@ -250,7 +252,9 @@ fun ImageDetailScreen(
                     TagRowLayout(
                         modifier = Modifier.padding(top = 24.dp),
                         tags = tagList,
-                        onClick = { /*TODO*/ }
+                        onClick = {
+                            navController.navigate("tagDetail/${it}")
+                        }
                     )
 
                     Text(

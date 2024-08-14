@@ -10,6 +10,7 @@ import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.Toast
 import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.clickable
@@ -99,6 +100,7 @@ fun LinkDetailScreen(
     var deleteDialog by remember { mutableStateOf(false) }
     var imageDialog by remember { mutableStateOf(false) }
     var imageUrl by remember { mutableStateOf("") }
+    val isSelfShareSuccess by viewModel.isSelfShareSuccess.collectAsState()
 
 
     val webView = remember(linkData) {
@@ -159,6 +161,18 @@ fun LinkDetailScreen(
         }
     }
 
+    when {
+        isSelfShareSuccess ->
+            if (isSelfShareSuccess) {
+                Toast.makeText(context, "파일을 저장되었습니다.", Toast.LENGTH_SHORT).show()
+                viewModel.setIsSelfShareSuccess(false)
+
+            } else {
+                Toast.makeText(context, "파일저장에 실패했습니다.", Toast.LENGTH_SHORT).show()
+                viewModel.setIsSelfShareSuccess(false)
+
+            }
+    }
 
     when {
         deleteDialog ->
@@ -187,7 +201,13 @@ fun LinkDetailScreen(
                     viewModel.downloadImage(imageUrl, context)
                     imageDialog = false
                 },
-                onSelfShareClick = { /*TODO*/ },
+                onSelfShareClick = {
+                    scope.launch {
+                        viewModel.shareSelf(context, imageUrl)
+                    }
+                    imageDialog = false
+
+                },
                 onOtherShareClick = {
                     scope.launch {
                         viewModel.downloadAndShareImage(

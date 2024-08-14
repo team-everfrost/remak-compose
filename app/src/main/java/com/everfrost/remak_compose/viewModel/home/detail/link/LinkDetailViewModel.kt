@@ -6,6 +6,7 @@ import android.content.Context.DOWNLOAD_SERVICE
 import android.content.Intent
 import android.net.Uri
 import android.os.Environment
+import android.provider.OpenableColumns
 import android.util.Log
 import android.webkit.URLUtil
 import android.widget.Toast
@@ -21,18 +22,23 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import java.io.InputStream
 import java.net.URL
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 @HiltViewModel
 class LinkDetailViewModel @Inject constructor(
-    private val documentRepository: DocumentRepository
+    private val documentRepository: DocumentRepository,
 
-) : ViewModel() {
+    ) : ViewModel() {
     private val _getDetailDataState = MutableStateFlow<APIResponse<MainListModel.DetailResponse>>(
         APIResponse.Empty()
     )
@@ -60,6 +66,9 @@ class LinkDetailViewModel @Inject constructor(
 
     private val _isImageShareReady = MutableStateFlow(false)
     val isImageShareReady: StateFlow<Boolean> = _isImageShareReady
+
+    private val _isSelfShareSuccess = MutableStateFlow(false)
+    val isSelfShareSuccess: StateFlow<Boolean> = _isSelfShareSuccess
 
     fun dataLoaded() {
         _isDataLoaded.value = true
@@ -121,6 +130,80 @@ class LinkDetailViewModel @Inject constructor(
                 _isDeleteComplete.value = true
             }
         }
+    }
+
+    suspend fun shareSelf(
+        context: Context,
+        imageUrl: String,
+    ) {
+        val fileName = URLUtil.guessFileName(imageUrl, null, null)
+        withContext(Dispatchers.IO) {
+            try {
+                val url = URL(imageUrl)
+                val connection = url.openConnection()
+                connection.doInput = true
+                connection.connect()
+                val inputStream = connection.getInputStream()
+                val uri = saveImageToInternalStorage(context, fileName, inputStream)
+                withContext(Dispatchers.Main) {
+                    uriToFile(context, uri)
+                }
+            } catch (e: Exception) {
+            }
+        }
+    }
+
+    private fun uriToFile(context: Context, uri: Uri) {
+        val fileList = mutableListOf<MultipartBody.Part>()
+        val mimeType = context.contentResolver.getType(uri)
+        val inputStream = context.contentResolver.openInputStream(uri)
+        val file = inputStreamToFile(inputStream!!, uri, context)
+        val requestFile = file.asRequestBody(mimeType?.toMediaTypeOrNull())
+        fileList.add(
+            MultipartBody.Part.createFormData(
+                "files",
+                file.name,
+                requestFile
+            )
+        )
+        uploadFile(fileList)
+    }
+
+    fun setIsSelfShareSuccess(value: Boolean) {
+        _isSelfShareSuccess.value = value
+    }
+
+    /** 파일 업로드 */
+    private fun uploadFile(files: List<MultipartBody.Part>) = viewModelScope.launch {
+        _isSelfShareSuccess.value = false
+        try {
+            val response = documentRepository.uploadFile(files)
+            if (response is APIResponse.Success) {
+                _isSelfShareSuccess.value = true
+            } else {
+            }
+        } catch (e: Exception) {
+        }
+    }
+
+    private fun inputStreamToFile(inputStream: InputStream, uri: Uri, context: Context): File {
+        val fileName = getFileNameFromUri(context, uri)
+        val file = File(context.cacheDir, fileName!!)
+
+        inputStream.use { input ->
+            Files.copy(input, file.toPath(), StandardCopyOption.REPLACE_EXISTING)
+        }
+        return file
+    }
+
+    private fun getFileNameFromUri(context: Context, uri: Uri): String? {
+        var fileName: String? = null
+        context.contentResolver.query(uri, null, null, null, null)?.use {
+            val nameIndex = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+            it.moveToFirst()
+            fileName = it.getString(nameIndex)
+        }
+        return fileName
     }
 
     fun downloadImage(url: String, context: Context) {

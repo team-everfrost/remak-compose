@@ -28,14 +28,28 @@
         </provider>
         <activity
             android:name=".MainActivity"
-            android:windowSoftInputMode="adjustResize"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Remak_compose">
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.Remak_compose"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
+
+                <action android:name="android.intent.action.SEND" />
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <!-- Accepting text/plain and links -->
+                <data android:mimeType="text/plain" />
+
+                <!-- Accepting images -->
+                <data android:mimeType="image/*" />
+
+                <!-- Accepting any file type -->
+                <data android:mimeType="*/*" />
             </intent-filter>
         </activity>
     </application>

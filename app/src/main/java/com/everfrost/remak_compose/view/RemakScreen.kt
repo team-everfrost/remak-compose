@@ -41,6 +41,7 @@ import com.everfrost.remak_compose.view.home.detail.memo.MemoDetailScreen
 import com.everfrost.remak_compose.view.home.main.HomeMainScreen
 import com.everfrost.remak_compose.view.profile.ProfileScreen
 import com.everfrost.remak_compose.view.tag.TagDetailScreen
+import com.everfrost.remak_compose.viewModel.home.main.HomeMainViewModel
 
 
 enum class RemakScreen(val route: String, val title: String, val icon: Int? = null) {
@@ -107,7 +108,8 @@ fun NavGraphBuilder.composableWithAnimation(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RemakApp(
-    startDestination: String
+    startDestination: String,
+    homeMainViewModel: HomeMainViewModel
 ) {
     val navController = rememberNavController()
     val navBackStackEntry = navController.currentBackStackEntryAsState()
@@ -135,7 +137,7 @@ fun RemakApp(
         ) { navBackStackEntry ->
             HomeMainScreen(
                 navController = navController,
-                viewModel = hiltViewModel(),
+                viewModel = homeMainViewModel,
                 collectionViewModel = hiltViewModel()
             )
         }

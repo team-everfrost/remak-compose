@@ -1,8 +1,6 @@
 package com.everfrost.remak_compose.viewModel.home.main
 
 import android.util.Log
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.everfrost.remak_compose.model.APIResponse
@@ -11,8 +9,8 @@ import com.everfrost.remak_compose.model.home.main.MainListModel
 import com.everfrost.remak_compose.repository.DocumentRepository
 import com.everfrost.remak_compose.repository.MainRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -68,6 +66,9 @@ class HomeMainViewModel @Inject constructor(
     private val _deleteDialog = MutableStateFlow(false)
     val deleteDialog: StateFlow<Boolean> = _deleteDialog
 
+    private val _isTokenExpired = MutableStateFlow(false)
+    val isTokenExpired: StateFlow<Boolean> = _isTokenExpired
+
     fun fetchMainList() {
         _isInit.value = true
         if (isDataEnd.value) return
@@ -117,12 +118,9 @@ class HomeMainViewModel @Inject constructor(
 
 
             } else {
-                _mainListState.value = APIResponse.Error(
-                    message = response.message ?: "",
-                    data = _mainListState.value.data,
-                    errorCode = response.errorCode ?: "500",
-                )
-                Log.d("메인", "fetchMainList: ${response.message}")
+                if (response.errorCode == "401") {
+                    _isTokenExpired.value = true
+                }
             }
         }
     }
@@ -190,19 +188,26 @@ class HomeMainViewModel @Inject constructor(
         viewModelScope.launch {
             val selectedList = _mainList.value.filter { it.isSelected }
             if (selectedList.isEmpty()) return@launch
-            for (data in selectedList) {
-                val response = documentRepository.deleteDocument(data.docId!!)
-                if (response is APIResponse.Success) {
-                    _deleteState.value = response
-                } else {
-                    _deleteState.value = APIResponse.Error(
-                        message = response.message ?: "",
-                        data = response.data,
-                        errorCode = response.errorCode ?: "500"
-                    )
+
+            val deleteJobs = selectedList.map { data ->
+                async {
+                    val response = documentRepository.deleteDocument(data.docId!!)
+                    if (response is APIResponse.Success) {
+                        _deleteState.value = response
+                    } else {
+                        _deleteState.value = APIResponse.Error(
+                            message = response.message ?: "",
+                            data = response.data,
+                            errorCode = response.errorCode ?: "500"
+                        )
+                    }
                 }
             }
 
+            // 모든 삭제 작업이 완료될 때까지 대기
+            deleteJobs.awaitAll()
+            // 모든 작업이 끝난 후에 resetMainList 호출
+            resetMainList()
         }
     }
 
@@ -212,6 +217,10 @@ class HomeMainViewModel @Inject constructor(
 
     fun setDeleteDialog(isShow: Boolean) {
         _deleteDialog.value = isShow
+    }
+
+    fun setTokenExpired(isExpired: Boolean) {
+        _isTokenExpired.value = isExpired
     }
 
 

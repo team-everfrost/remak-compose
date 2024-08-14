@@ -57,6 +57,7 @@ import com.everfrost.remak_compose.ui.theme.white
 import com.everfrost.remak_compose.view.BottomNav
 import com.everfrost.remak_compose.view.RemakScreen
 import com.everfrost.remak_compose.view.collection.CollectionBottomSheet
+import com.everfrost.remak_compose.view.common.dialog.CustomConfirmDialog
 import com.everfrost.remak_compose.view.common.dialog.CustomSelectDialog
 import com.everfrost.remak_compose.view.common.layout.FileLayout
 import com.everfrost.remak_compose.view.common.layout.ImageLayout
@@ -86,6 +87,7 @@ fun HomeMainScreen(
     val haptics = LocalHapticFeedback.current
     val isInit by viewModel.isInit.collectAsState()
     val deleteDialog by viewModel.deleteDialog.collectAsState()
+    val isTokenExpired by viewModel.isTokenExpired.collectAsState()
 
 
     var collectionBottomSheet by remember {
@@ -96,6 +98,24 @@ fun HomeMainScreen(
     )
     val scope = rememberCoroutineScope()
 
+    when {
+        isTokenExpired ->
+            CustomConfirmDialog(
+                onDismissRequest = {
+                    viewModel.setTokenExpired(false)
+                    navController.navigate(RemakScreen.OnBoarding.route) {
+                        popUpTo(0) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
+                },
+                mainTitle = "로그인 정보가 만료되었습니다",
+                subTitle = "다시 로그인해주세요",
+                btnText = "확인"
+            )
+
+    }
 
     when {
         deleteDialog ->
@@ -106,7 +126,6 @@ fun HomeMainScreen(
                 onConfirm = {
                     viewModel.setDeleteDialog(false)
                     viewModel.deleteDocument()
-                    viewModel.resetMainList()
                     viewModel.toggleEditMode()
                 },
                 mainTitle = "삭제하시겠습니까?",

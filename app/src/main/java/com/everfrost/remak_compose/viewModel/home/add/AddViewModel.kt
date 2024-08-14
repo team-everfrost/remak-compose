@@ -4,10 +4,6 @@ import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
 import android.util.Log
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.everfrost.remak_compose.model.APIResponse
@@ -84,6 +80,25 @@ class AddViewModel @Inject constructor(
         }
     }
 
+    fun addShareMemo(memo: String) {
+        viewModelScope.launch {
+            _addMemoState.value =
+                documentRepository.createMemo(CreateModel.MemoRequestBody(memo))
+            if (_addMemoState.value is APIResponse.Success) {
+                _isActionComplete.value = true
+            }
+        }
+    }
+
+    fun createShareWebPage(url: String) {
+        viewModelScope.launch {
+            _createWebPageState.value = documentRepository.createWebPage(url)
+            if (_createWebPageState.value is APIResponse.Success) {
+                _isActionComplete.value = true
+            }
+        }
+    }
+
     fun createWebPage() {
         Log.d("AddViewModel", _linkText.value)
         val urlList = formatWebPageUrl()
@@ -128,6 +143,7 @@ class AddViewModel @Inject constructor(
             _uploadFileResponse.value = documentRepository.uploadFile(fileList)
             if (_uploadFileResponse.value is APIResponse.Success) {
                 _uploadState.value = UploadState.SUCCESS
+                _isActionComplete.value = true
             } else {
                 _uploadState.value = UploadState.FAIL
                 if (_uploadFileResponse.value.errorCode == "413") {
@@ -142,7 +158,6 @@ class AddViewModel @Inject constructor(
         if (uris.size > 10) {
             return
         }
-
         val fileList = mutableListOf<MultipartBody.Part>()
         for (uri in uris) {
             val mimeType = context.contentResolver.getType(uri)

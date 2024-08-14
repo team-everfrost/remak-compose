@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -92,9 +93,9 @@ fun TagScreen(
                 )
 
                 TagSearchTextField(
-                    value = tagText,
+                    value = TextFieldValue(tagText),
                     onValueChange = {
-                        viewModel.setLinkText(it)
+                        viewModel.setLinkText(it.text)
                         debounceJob?.cancel()
                         debounceJob = coroutineScope.launch {
                             delay(300) // 300ms 딜레이
@@ -106,7 +107,7 @@ fun TagScreen(
                     keyboardOptions = KeyboardOptions(),
                     modifier = Modifier
                         .padding(top = 16.dp)
-                        .height(56.dp)
+                        .height(60.dp)
                         .clip(RoundedCornerShape(12.dp))
                 )
 

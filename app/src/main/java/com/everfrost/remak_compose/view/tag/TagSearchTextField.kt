@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -24,11 +25,11 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.everfrost.remak_compose.R
-import com.everfrost.remak_compose.ui.theme.bgGray2
 import com.everfrost.remak_compose.ui.theme.black1
 import com.everfrost.remak_compose.ui.theme.black4
 import com.everfrost.remak_compose.ui.theme.pretendard
@@ -38,14 +39,15 @@ import com.everfrost.remak_compose.view.common.PasswordVisualTransformation
 
 @Composable
 fun TagSearchTextField(
-    value: String,
-    onValueChange: (String) -> Unit,
+    value: TextFieldValue,
+    onValueChange: (TextFieldValue) -> Unit,
     modifier: Modifier = Modifier,
     isError: Boolean = false,
     placeholder: String,
     keyboardOptions: KeyboardOptions,
     isPassword: Boolean = false,
-    isEnable: Boolean = true
+    isEnable: Boolean = true,
+    onEnter: () -> Unit = {}
 ) {
     var isFocused by remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
@@ -56,6 +58,12 @@ fun TagSearchTextField(
         keyboardOptions = keyboardOptions,
         visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
         onValueChange = onValueChange,
+        keyboardActions = KeyboardActions(
+            onDone = {
+                onEnter()
+                focusManager.clearFocus()
+            }
+        ),
         enabled = isEnable,
         modifier = modifier
             .onFocusChanged { focusState ->
@@ -93,7 +101,7 @@ fun TagSearchTextField(
                         contentDescription = null
                     )
                     Box(modifier = Modifier.weight(1f)) { // 공간을 채우도록 weight 사용
-                        if (value.isEmpty()) {
+                        if (value.text.isEmpty()) {
                             Text(
                                 text = placeholder,
                                 style = TextStyle(

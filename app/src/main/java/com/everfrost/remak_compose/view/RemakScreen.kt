@@ -147,7 +147,8 @@ fun RemakApp(
         ) {
             // MainScreen(navController = navController)
             SearchScreen(
-                navController = navController
+                navController = navController,
+                viewModel = hiltViewModel()
             )
         }
 

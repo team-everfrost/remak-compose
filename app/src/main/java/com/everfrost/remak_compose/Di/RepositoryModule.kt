@@ -9,6 +9,8 @@ import com.everfrost.remak_compose.repository.DocumentRepository
 import com.everfrost.remak_compose.repository.DocumentRepositoryImpl
 import com.everfrost.remak_compose.repository.MainRepository
 import com.everfrost.remak_compose.repository.MainRepositoryImpl
+import com.everfrost.remak_compose.repository.SearchRepository
+import com.everfrost.remak_compose.repository.SearchRepositoryImpl
 import com.everfrost.remak_compose.repository.TagRepository
 import com.everfrost.remak_compose.repository.TagRepositoryImpl
 import dagger.Module
@@ -45,5 +47,10 @@ object RepositoryModule {
     @Singleton
     fun collectionRepository(remoteDataSource: RemoteDataSource): CollectionRepository =
         CollectionRepositoryImpl(remoteDataSource)
+
+    @Provides
+    @Singleton
+    fun searchRepository(remoteDataSource: RemoteDataSource): SearchRepository =
+        SearchRepositoryImpl(remoteDataSource)
 
 }

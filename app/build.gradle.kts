@@ -91,6 +91,8 @@ dependencies {
     implementation(libs.lottie)
     // zoomable
     implementation(libs.telephoto)
+    //shimmer
+    implementation(libs.shimmer)
 
 }
 

@@ -153,5 +153,20 @@ interface ApiService {
     @DELETE("collection/{name}")
     suspend fun deleteCollection(@Path("name") name: String): retrofit2.Response<DeleteModel.ResponseBody>
 
+    // search ---------------------------------------------------------
+    // 텍스트검색
+    @GET("document/search/text")
+    suspend fun getTextSearchData(
+        @Query("query") query: String?,
+        @Query("limit") limit: Int? = 20,
+        @Query("offset") offset: Int?
+    ): retrofit2.Response<MainListModel.Response>
+
+    // 임베딩 검색
+    @GET("document/search/hybrid")
+    suspend fun getEmbeddingData(
+        @Query("query") query: String?,
+    ): retrofit2.Response<MainListModel.Response>
+
 
 }

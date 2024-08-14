@@ -108,6 +108,18 @@ interface RemoteDataSource {
 
     //컬렉션 삭제
     suspend fun deleteCollection(name: String): Response<DeleteModel.ResponseBody>
+
+    // search--------------------------------------------------------------------------------------------
+    //텍스트검색
+    suspend fun getTextSearchData(
+        query: String,
+        offset: Int?
+    ): Response<MainListModel.Response>
+
+    //임베딩 검색
+    suspend fun getEmbeddingSearchData(
+        query: String,
+    ): Response<MainListModel.Response>
 }
 
 class RemoteDataSourceImpl @Inject constructor(
@@ -260,6 +272,22 @@ class RemoteDataSourceImpl @Inject constructor(
     //컬렉션 삭제
     override suspend fun deleteCollection(name: String): Response<DeleteModel.ResponseBody> {
         return apiService.deleteCollection(name)
+    }
+
+    // search--------------------------------------------------------------------------------------------
+    //텍스트검색
+    override suspend fun getTextSearchData(
+        query: String,
+        offset: Int?
+    ): Response<MainListModel.Response> {
+        return apiService.getTextSearchData(query, offset = offset)
+    }
+
+    //임베딩 검색
+    override suspend fun getEmbeddingSearchData(
+        query: String,
+    ): Response<MainListModel.Response> {
+        return apiService.getEmbeddingData(query)
     }
 
 

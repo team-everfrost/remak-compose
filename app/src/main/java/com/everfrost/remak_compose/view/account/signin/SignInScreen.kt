@@ -3,6 +3,7 @@ package com.everfrost.remak_compose.view.account.signin
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,21 +20,24 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.everfrost.remak_compose.model.APIResponse
+import com.everfrost.remak_compose.ui.theme.black3
 import com.everfrost.remak_compose.ui.theme.pretendard
 import com.everfrost.remak_compose.ui.theme.red1
 import com.everfrost.remak_compose.ui.theme.white
-import com.everfrost.remak_compose.view.BottomNav
 import com.everfrost.remak_compose.view.account.widget.textfield.AccountTextField
 import com.everfrost.remak_compose.view.common.appbar.BackTitleAppBar
 import com.everfrost.remak_compose.view.common.button.PrimaryButton
@@ -63,9 +67,7 @@ fun SignInScreen(
                 title = "로그인"
             )
         },
-        bottomBar = {
-            BottomNav(navController = navController)
-        },
+
         modifier = Modifier.imePadding()
     ) { innerPadding ->
         Box(
@@ -77,6 +79,13 @@ fun SignInScreen(
             Column(
                 modifier = Modifier.padding(top = 48.dp, start = 16.dp, end = 16.dp)
             ) {
+                Text(
+                    text = "이메일", style = TextStyle(
+                        fontSize = 14.sp,
+                        fontFamily = pretendard,
+                        fontWeight = FontWeight.Medium
+                    )
+                )
                 AccountTextField(
                     value = email,
                     onValueChange = {
@@ -84,6 +93,7 @@ fun SignInScreen(
                         viewModel.checkIsValidEmail()
                     },
                     modifier = Modifier
+                        .padding(top = 7.dp)
                         .fillMaxWidth()
                         .height(63.dp)
                         .background(white),
@@ -172,7 +182,6 @@ fun SignInScreen(
                         .padding(bottom = 30.dp)
                         .fillMaxWidth()
                         .height(63.dp),
-
                     onClick = {
                         if (emailCheckState is APIResponse.Success) {
                             viewModel.signIn(email, password)
@@ -181,10 +190,18 @@ fun SignInScreen(
 
                         }
                     },
-                    isEnable = if (emailCheckState is APIResponse.Success && password.isNotEmpty()) {
-                        true
+                    isEnable = if (emailCheckState is APIResponse.Success) {
+                        if (password.isNotEmpty()) {
+                            true
+                        } else {
+                            false
+                        }
                     } else {
-                        isValidEmail
+                        if (isValidEmail) {
+                            true
+                        } else {
+                            false
+                        }
                     },
                     text = if (emailCheckState is APIResponse.Success) {
                         "로그인"
@@ -192,6 +209,33 @@ fun SignInScreen(
                         "다음으로"
                     }
                 )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = androidx.compose.foundation.layout.Arrangement.Center
+                ) {
+                    Text(
+                        text = "처음 이용하시나요?", style = TextStyle(
+                            fontSize = 12.sp,
+                            fontFamily = pretendard,
+                            fontWeight = FontWeight.Medium,
+                            color = black3
+                        ),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .padding(bottom = 26.dp)
+                            .drawBehind {
+                                val strokeWidthPx = 1.dp.toPx()
+                                val verticalOffset = size.height - 2.sp.toPx()
+                                drawLine(
+                                    color = black3,
+                                    strokeWidth = strokeWidthPx,
+                                    start = Offset(0f, verticalOffset),
+                                    end = Offset(size.width, verticalOffset)
+                                )
+                            }
+                    )
+                }
 
 
             }

@@ -1,5 +1,6 @@
 package com.everfrost.remak_compose.view
 
+import Register2Screen
 import SearchScreen
 import TagScreen
 import androidx.compose.animation.AnimatedContentTransitionScope
@@ -24,6 +25,10 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.everfrost.remak_compose.R
 import com.everfrost.remak_compose.view.account.onboarding.OnboardingScreen
+import com.everfrost.remak_compose.view.account.register.Register1Screen
+import com.everfrost.remak_compose.view.account.register.Register3Screen
+import com.everfrost.remak_compose.view.account.register.Register4Screen
+import com.everfrost.remak_compose.view.account.register.RegisterAgreeScreen
 import com.everfrost.remak_compose.view.account.signin.SignInScreen
 import com.everfrost.remak_compose.view.collection.AddCollectionScreen
 import com.everfrost.remak_compose.view.collection.CollectionDetailScreen
@@ -47,6 +52,11 @@ import com.everfrost.remak_compose.viewModel.home.main.HomeMainViewModel
 enum class RemakScreen(val route: String, val title: String, val icon: Int? = null) {
     OnBoarding("OnBoarding", "온보딩"),
     SignIn("SignIn", "로그인"),
+    RegisterAgree("RegisterAgree", "회원가입 동의"),
+    Register1("Register1", "회원가입 1단계"),
+    Register2("Register2", "회원가입 2단계"),
+    Register3("Register3", "회원가입 3단계"),
+    Register4("Register4", "회원가입 4단계"),
     Main("Main", "메인", icon = R.drawable.icon_home),
     Search("Search", "검색", icon = R.drawable.icon_search),
     Tag("Tag", "태그", icon = R.drawable.icon_tag),
@@ -113,8 +123,6 @@ fun RemakApp(
 ) {
     val navController = rememberNavController()
     val navBackStackEntry = navController.currentBackStackEntryAsState()
-
-
     NavHost(
         navController = navController,
         startDestination = startDestination
@@ -129,6 +137,70 @@ fun RemakApp(
         ) { navBackStackEntry ->
             SignInScreen(navController = navController)
         }
+
+        composableWithAnimation(
+            route = RemakScreen.RegisterAgree.route
+        ) { navBackStackEntry ->
+            val parentEntry = remember(navBackStackEntry) {
+                navController.getBackStackEntry(RemakScreen.RegisterAgree.route)
+            }
+            RegisterAgreeScreen(
+                navController = navController,
+                viewModel = hiltViewModel(parentEntry)
+            )
+        }
+
+        composableWithAnimation(
+            route = RemakScreen.Register1.route,
+        ) { navBackStackEntry ->
+            val parentEntry = remember(navBackStackEntry) {
+                navController.getBackStackEntry(RemakScreen.RegisterAgree.route)
+            }
+            Register1Screen(
+                navController = navController,
+                viewModel = hiltViewModel(parentEntry)
+            )
+        }
+
+        composableWithAnimation(
+            route = RemakScreen.Register2.route,
+        ) { navBackStackEntry ->
+            val parentEntry = remember(navBackStackEntry) {
+                navController.getBackStackEntry(RemakScreen.RegisterAgree.route)
+            }
+            Register2Screen(
+                navController = navController,
+                viewModel = hiltViewModel(parentEntry)
+            )
+        }
+
+        composableWithAnimation(
+            route = RemakScreen.Register3.route,
+        ) { navBackStackEntry ->
+            val parentEntry = remember(navBackStackEntry) {
+                navController.getBackStackEntry(RemakScreen.RegisterAgree.route)
+            }
+            Register3Screen(
+                navController = navController,
+                viewModel = hiltViewModel(parentEntry),
+            )
+        }
+
+        composableWithAnimation(
+            route = RemakScreen.Register4.route,
+        ) { navBackStackEntry ->
+            val parentEntry = remember(navBackStackEntry) {
+                navController.getBackStackEntry(RemakScreen.RegisterAgree.route)
+            }
+            Register4Screen(
+                navController = navController,
+                viewModel = hiltViewModel(parentEntry),
+            )
+        }
+
+
+
+
 
         composable(
             route = RemakScreen.Main.route,

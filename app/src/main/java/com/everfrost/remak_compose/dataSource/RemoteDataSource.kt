@@ -2,6 +2,7 @@ package com.everfrost.remak_compose.dataSource
 
 import com.everfrost.remak_compose.model.DeleteModel
 import com.everfrost.remak_compose.model.account.SignInModel
+import com.everfrost.remak_compose.model.account.SignUpModel
 import com.everfrost.remak_compose.model.collection.AddDataInCollectionModel
 import com.everfrost.remak_compose.model.collection.CollectionListModel
 import com.everfrost.remak_compose.model.collection.CreateCollectionModel
@@ -22,7 +23,13 @@ interface RemoteDataSource {
     //account--------------------------------------------------------------------------------------------
     suspend fun checkEmail(email: String): Response<SignInModel.CheckEmailResponse>
     suspend fun signIn(email: String, password: String): Response<SignInModel.ResponseBody>
+    suspend fun getVerifyCode(email: String): Response<SignUpModel.GetVerifyResponseBody>
+    suspend fun checkVerifyCode(
+        signupCode: String,
+        email: String
+    ): Response<SignUpModel.CheckVerifyResponseBody>
 
+    suspend fun signUp(email: String, password: String): Response<SignUpModel.SignUpResponseBody>
     suspend fun getUserData(): Response<UserModel.Response>
     suspend fun getStorageSize(): Response<UserModel.StorageData>
     suspend fun getStorageUsage(): Response<UserModel.StorageData>
@@ -137,6 +144,27 @@ class RemoteDataSourceImpl @Inject constructor(
     ): Response<SignInModel.ResponseBody> {
         val requestBody = SignInModel.RequestBody(email = email, password = password)
         return apiService.signIn(requestBody)
+    }
+
+    override suspend fun getVerifyCode(email: String): Response<SignUpModel.GetVerifyResponseBody> {
+        val requestBody = SignUpModel.GetVerifyRequestBody(email)
+        return apiService.getVerifyCode(requestBody)
+    }
+
+    override suspend fun checkVerifyCode(
+        signupCode: String,
+        email: String
+    ): Response<SignUpModel.CheckVerifyResponseBody> {
+        val requestBody = SignUpModel.CheckVerifyRequestBody(signupCode, email)
+        return apiService.checkVerifyCode(requestBody)
+    }
+
+    override suspend fun signUp(
+        email: String,
+        password: String
+    ): Response<SignUpModel.SignUpResponseBody> {
+        val requestBody = SignUpModel.SignUpRequestBody(email, password)
+        return apiService.signUp(requestBody)
     }
 
     override suspend fun getUserData(): Response<UserModel.Response> {

@@ -2,6 +2,7 @@ package com.everfrost.remak_compose.service
 
 import com.everfrost.remak_compose.model.DeleteModel
 import com.everfrost.remak_compose.model.account.SignInModel
+import com.everfrost.remak_compose.model.account.SignUpModel
 import com.everfrost.remak_compose.model.collection.AddDataInCollectionModel
 import com.everfrost.remak_compose.model.collection.CollectionListModel
 import com.everfrost.remak_compose.model.collection.CreateCollectionModel
@@ -29,6 +30,18 @@ interface ApiService {
     //이메일 존재하는지 확인
     @POST("auth/check-email")
     suspend fun checkEmail(@Body body: SignInModel.CheckEmailRequest): retrofit2.Response<SignInModel.CheckEmailResponse>
+
+    //인증번호 받기
+    @POST("auth/signup-code")
+    suspend fun getVerifyCode(@Body body: SignUpModel.GetVerifyRequestBody): retrofit2.Response<SignUpModel.GetVerifyResponseBody>
+
+    //인증번호 확인
+    @POST("auth/verify-code")
+    suspend fun checkVerifyCode(@Body body: SignUpModel.CheckVerifyRequestBody): retrofit2.Response<SignUpModel.CheckVerifyResponseBody>
+
+    //회원가입
+    @POST("auth/local/signup")
+    suspend fun signUp(@Body body: SignUpModel.SignUpRequestBody): retrofit2.Response<SignUpModel.SignUpResponseBody>
 
     //로그인
     @POST("auth/local/login")

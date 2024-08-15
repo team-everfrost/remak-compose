@@ -45,6 +45,11 @@ interface RemoteDataSource {
     suspend fun getStorageSize(): Response<UserModel.StorageData>
     suspend fun getStorageUsage(): Response<UserModel.StorageData>
 
+    //회원탈퇴
+    suspend fun withdrawCode(): Response<SignUpModel.WithdrawVerifyResponseBody>
+    suspend fun verifyWithdrawCode(code: String): Response<SignUpModel.WithdrawVerifyResponseBody>
+    suspend fun withdraw(): Response<SignUpModel.WithdrawVerifyResponseBody>
+
     //home--------------------------------------------------------------------------------------------
     suspend fun getMainList(cursor: String?, docID: String?): Response<MainListModel.Response>
 
@@ -209,6 +214,20 @@ class RemoteDataSourceImpl @Inject constructor(
 
     override suspend fun getStorageUsage(): Response<UserModel.StorageData> {
         return apiService.getStorageUsage()
+    }
+
+    //회원탈퇴
+    override suspend fun withdrawCode(): Response<SignUpModel.WithdrawVerifyResponseBody> {
+        return apiService.withdrawCode()
+    }
+
+    override suspend fun verifyWithdrawCode(code: String): Response<SignUpModel.WithdrawVerifyResponseBody> {
+        val requestBody = SignUpModel.WithdrawVerifyRequestBody(code)
+        return apiService.verifyWithdrawCode(requestBody)
+    }
+
+    override suspend fun withdraw(): Response<SignUpModel.WithdrawVerifyResponseBody> {
+        return apiService.withdraw()
     }
 
     //home--------------------------------------------------------------------------------------------

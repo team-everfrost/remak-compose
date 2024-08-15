@@ -143,7 +143,9 @@ fun MemoDetailScreen(
 
                 },
                 isEditMode = isEditMode,
-                backClick = { /*TODO*/ },
+                backClick = {
+                    navController.popBackStack()
+                },
                 title = "메모",
                 isShareEnable = false,
                 shareClick = { },

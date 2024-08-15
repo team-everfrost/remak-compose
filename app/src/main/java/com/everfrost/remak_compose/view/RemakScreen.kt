@@ -48,7 +48,12 @@ import com.everfrost.remak_compose.view.home.detail.image.ImageViewerScreen
 import com.everfrost.remak_compose.view.home.detail.link.LinkDetailScreen
 import com.everfrost.remak_compose.view.home.detail.memo.MemoDetailScreen
 import com.everfrost.remak_compose.view.home.main.HomeMainScreen
+import com.everfrost.remak_compose.view.profile.EditProfileScreen
+import com.everfrost.remak_compose.view.profile.ProfileResetPassword1Screen
+import com.everfrost.remak_compose.view.profile.ProfileResetPassword2Screen
+import com.everfrost.remak_compose.view.profile.ProfileResetPassword3Screen
 import com.everfrost.remak_compose.view.profile.ProfileScreen
+import com.everfrost.remak_compose.view.profile.ProfileWithdrawScreen
 import com.everfrost.remak_compose.view.tag.TagDetailScreen
 import com.everfrost.remak_compose.viewModel.home.main.HomeMainViewModel
 
@@ -74,6 +79,11 @@ enum class RemakScreen(val route: String, val title: String, val icon: Int? = nu
     CollectionDetail("CollectionDetail/{collectionName}/{collectionDescription}", "컬렉션 상세"),
     EditCollection("EditCollection/{collectionName}/{collectionDescription}", "컬렉션 수정"),
     Profile("Profile", "프로필", icon = R.drawable.icon_profile),
+    EditProfile("EditProfile", "프로필 수정"),
+    ProfileResetPassword1("ProfileResetPassword1", "프로필 비밀번호 재설정 1단계"),
+    ProfileResetPassword2("ProfileResetPassword2", "프로필 비밀번호 재설정 2단계"),
+    ProfileResetPassword3("ProfileResetPassword3", "프로필 비밀번호 재설정 3단계"),
+    ProfileWithdraw("ProfileWithdrawal", "회원 탈퇴"),
     LinkDetail("LinkDetail/{docId}", "링크 상세"),
     ImageDetail("ImageDetail/{docId}", "이미지 상세"),
     ImageViewer("ImageViewer", "이미지 뷰어"),
@@ -390,12 +400,75 @@ fun RemakApp(
         composable(
             route = RemakScreen.Profile.route,
             enterTransition = { EnterTransition.None },
-            exitTransition = { ExitTransition.None },
+            exitTransition = { ExitTransition.KeepUntilTransitionsFinished },
         ) {
             // MainScreen(navController = navController)
             ProfileScreen(
                 navController = navController,
-                viewModel = hiltViewModel()
+                viewModel = hiltViewModel(),
+                resetPasswordViewModel = hiltViewModel()
+                
+            )
+        }
+
+        composableWithAnimation(
+            route = RemakScreen.EditProfile.route,
+        ) { navBackStackEntry ->
+            val parentEntry = remember(navBackStackEntry) {
+                navController.getBackStackEntry(RemakScreen.Profile.route)
+            }
+            EditProfileScreen(
+                navController = navController,
+                viewModel = hiltViewModel(parentEntry),
+                resetPasswordViewModel = hiltViewModel(parentEntry)
+            )
+        }
+
+        composableWithAnimation(
+            route = RemakScreen.ProfileResetPassword1.route,
+        ) { navBackStackEntry ->
+            val parentEntry = remember(navBackStackEntry) {
+                navController.getBackStackEntry(RemakScreen.Profile.route)
+            }
+            ProfileResetPassword1Screen(
+                navController = navController,
+                viewModel = hiltViewModel(parentEntry),
+            )
+        }
+
+        composableWithAnimation(
+            route = RemakScreen.ProfileResetPassword2.route,
+        ) { navBackStackEntry ->
+            val parentEntry = remember(navBackStackEntry) {
+                navController.getBackStackEntry(RemakScreen.Profile.route)
+            }
+            ProfileResetPassword2Screen(
+                navController = navController,
+                viewModel = hiltViewModel(parentEntry),
+            )
+        }
+
+        composableWithAnimation(
+            route = RemakScreen.ProfileResetPassword3.route,
+        ) { navBackStackEntry ->
+            val parentEntry = remember(navBackStackEntry) {
+                navController.getBackStackEntry(RemakScreen.Profile.route)
+            }
+            ProfileResetPassword3Screen(
+                navController = navController,
+                viewModel = hiltViewModel(parentEntry),
+            )
+        }
+
+        composableWithAnimation(
+            route = RemakScreen.ProfileWithdraw.route,
+        ) { navBackStackEntry ->
+            val parentEntry = remember(navBackStackEntry) {
+                navController.getBackStackEntry(RemakScreen.Profile.route)
+            }
+            ProfileWithdrawScreen(
+                navController = navController,
+                viewModel = hiltViewModel(parentEntry),
             )
         }
 

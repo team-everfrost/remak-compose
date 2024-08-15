@@ -48,12 +48,14 @@ import com.everfrost.remak_compose.ui.theme.white
 import com.everfrost.remak_compose.view.BottomNav
 import com.everfrost.remak_compose.view.RemakScreen
 import com.everfrost.remak_compose.view.common.button.GrayButton
+import com.everfrost.remak_compose.viewModel.account.resetPassword.ResetPasswordViewModel
 import com.everfrost.remak_compose.viewModel.profile.ProfileViewModel
 
 @Composable
 fun ProfileScreen(
     navController: NavController,
-    viewModel: ProfileViewModel
+    viewModel: ProfileViewModel,
+    resetPasswordViewModel: ResetPasswordViewModel
 ) {
 
     val context = LocalContext.current
@@ -63,6 +65,7 @@ fun ProfileScreen(
 
     LaunchedEffect(true) {
         viewModel.getStorageSize()
+        viewModel.getUserData()
     }
 
     Scaffold(
@@ -94,7 +97,7 @@ fun ProfileScreen(
                             .width(81.dp)
                             .height(30.dp),
                         onClick = {
-                            navController.navigate(RemakScreen.AddCollection.route)
+                            navController.navigate(RemakScreen.EditProfile.route)
                         },
                         text = "프로필 편집"
                     )

@@ -38,6 +38,7 @@ import com.everfrost.remak_compose.ui.theme.black3
 import com.everfrost.remak_compose.ui.theme.pretendard
 import com.everfrost.remak_compose.ui.theme.red1
 import com.everfrost.remak_compose.ui.theme.white
+import com.everfrost.remak_compose.view.RemakScreen
 import com.everfrost.remak_compose.view.account.widget.textfield.AccountTextField
 import com.everfrost.remak_compose.view.common.appbar.BackTitleAppBar
 import com.everfrost.remak_compose.view.common.button.PrimaryButton
@@ -59,6 +60,18 @@ fun SignInScreen(
 
     // FocusRequester를 사용하여 포커스를 관리
     val passwordFocusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(signInState) {
+        if (signInState is APIResponse.Success) {
+            navController.navigate(RemakScreen.Main.route) {
+                popUpTo(0) {
+                    inclusive = true
+                }
+
+            }
+        }
+
+    }
     Scaffold(
         containerColor = white,
         topBar = {

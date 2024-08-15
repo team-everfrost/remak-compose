@@ -32,6 +32,9 @@ interface AccountRepository {
     suspend fun getStorageSize(): APIResponse<UserModel.StorageData>
     suspend fun getStorageUsage(): APIResponse<UserModel.StorageData>
 
+    suspend fun withdrawCode(): APIResponse<SignUpModel.WithdrawVerifyResponseBody>
+    suspend fun verifyWithdrawCode(code: String): APIResponse<SignUpModel.WithdrawVerifyResponseBody>
+    suspend fun withdraw(): APIResponse<SignUpModel.WithdrawVerifyResponseBody>
 }
 
 class AccountRepositoryImpl(
@@ -265,6 +268,69 @@ class AccountRepositoryImpl(
     override suspend fun getStorageUsage(): APIResponse<UserModel.StorageData> {
         try {
             val response = remoteDataSource.getStorageUsage()
+            return if (response.isSuccessful) {
+                APIResponse.Success(data = response.body())
+            } else {
+                APIResponse.Error(
+                    message = "message: ${
+                        response.errorBody()!!.string()
+                    }",
+                    errorCode = response.code().toString()
+                )
+            }
+        } catch (e: Exception) {
+            return APIResponse.Error(
+                message = "Sign in failed: ${e.message}",
+                errorCode = "500"
+            )
+        }
+    }
+
+    override suspend fun withdrawCode(): APIResponse<SignUpModel.WithdrawVerifyResponseBody> {
+        try {
+            val response = remoteDataSource.withdrawCode()
+            return if (response.isSuccessful) {
+                APIResponse.Success(data = response.body())
+            } else {
+                APIResponse.Error(
+                    message = "message: ${
+                        response.errorBody()!!.string()
+                    }",
+                    errorCode = response.code().toString()
+                )
+            }
+        } catch (e: Exception) {
+            return APIResponse.Error(
+                message = "Sign in failed: ${e.message}",
+                errorCode = "500"
+            )
+        }
+    }
+
+    override suspend fun verifyWithdrawCode(code: String): APIResponse<SignUpModel.WithdrawVerifyResponseBody> {
+        try {
+            val response = remoteDataSource.verifyWithdrawCode(code)
+            return if (response.isSuccessful) {
+                APIResponse.Success(data = response.body())
+            } else {
+                APIResponse.Error(
+                    message = "message: ${
+                        response.errorBody()!!.string()
+                    }",
+                    errorCode = response.code().toString()
+                )
+            }
+        } catch (e: Exception) {
+            return APIResponse.Error(
+                message = "Sign in failed: ${e.message}",
+                errorCode = "500"
+            )
+        }
+    }
+
+    override suspend fun withdraw(): APIResponse<SignUpModel.WithdrawVerifyResponseBody> {
+        try {
+            val response = remoteDataSource.withdraw()
             return if (response.isSuccessful) {
                 APIResponse.Success(data = response.body())
             } else {

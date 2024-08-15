@@ -53,6 +53,16 @@ interface ApiService {
     @POST("auth/reset-password")
     suspend fun resetPassword(@Body body: SignUpModel.SignUpRequestBody): retrofit2.Response<SignUpModel.CheckVerifyResponseBody>
 
+    //회원탈퇴
+    @POST("auth/withdraw-code")
+    suspend fun withdrawCode(): retrofit2.Response<SignUpModel.WithdrawVerifyResponseBody>
+
+    @POST("auth/verify-withdraw-code")
+    suspend fun verifyWithdrawCode(@Body body: SignUpModel.WithdrawVerifyRequestBody): retrofit2.Response<SignUpModel.WithdrawVerifyResponseBody>
+
+    @POST("auth/withdraw")
+    suspend fun withdraw(): retrofit2.Response<SignUpModel.WithdrawVerifyResponseBody>
+
 
     //로그인
     @POST("auth/local/login")

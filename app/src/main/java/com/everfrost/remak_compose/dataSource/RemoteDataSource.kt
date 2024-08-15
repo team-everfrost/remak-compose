@@ -1,5 +1,6 @@
 package com.everfrost.remak_compose.dataSource
 
+import android.util.Log
 import com.everfrost.remak_compose.model.DeleteModel
 import com.everfrost.remak_compose.model.account.SignInModel
 import com.everfrost.remak_compose.model.account.SignUpModel
@@ -151,6 +152,7 @@ class RemoteDataSourceImpl @Inject constructor(
     //account--------------------------------------------------------------------------------------------
     override suspend fun checkEmail(email: String): Response<SignInModel.CheckEmailResponse> {
         val requestBody = SignInModel.CheckEmailRequest(email = email)
+        Log.d("checkEmail", requestBody.toString())
         return apiService.checkEmail(requestBody)
     }
 

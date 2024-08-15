@@ -224,7 +224,9 @@ fun SignInScreen(
                 )
 
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .padding(bottom = 40.dp)
+                        .fillMaxWidth(),
                     horizontalArrangement = androidx.compose.foundation.layout.Arrangement.Center
                 ) {
                     Text(

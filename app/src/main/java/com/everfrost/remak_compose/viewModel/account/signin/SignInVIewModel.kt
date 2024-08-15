@@ -49,6 +49,9 @@ class SignInVIewModel @Inject constructor(
 
     fun checkEmail(email: String) = viewModelScope.launch {
         _emailCheckState.value = accountRepository.checkEmail(email)
+        if (_emailCheckState.value is APIResponse.Error) {
+
+        }
     }
 
     fun signIn(email: String, password: String) = viewModelScope.launch {

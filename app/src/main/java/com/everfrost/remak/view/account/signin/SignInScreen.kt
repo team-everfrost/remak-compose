@@ -1,6 +1,8 @@
 package com.everfrost.remak.view.account.signin
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -226,11 +228,28 @@ fun SignInScreen(
                 Row(
                     modifier = Modifier
                         .padding(bottom = 40.dp)
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .clickable(
+                            interactionSource = remember {
+                                MutableInteractionSource()
+                            },
+                            indication = null
+                        ) {
+                            if (signInState is APIResponse.Error) {
+                                navController.navigate(RemakScreen.ResetPassword1.route)
+                            } else {
+                                navController.navigate(RemakScreen.RegisterAgree.route)
+                            }
+
+                        },
                     horizontalArrangement = androidx.compose.foundation.layout.Arrangement.Center
                 ) {
                     Text(
-                        text = "처음 이용하시나요?", style = TextStyle(
+                        text = if (signInState is APIResponse.Error) {
+                            "비밀번호가 기억나지 않으세요?"
+                        } else {
+                            "처음 이용하시나요?"
+                        }, style = TextStyle(
                             fontSize = 12.sp,
                             fontFamily = pretendard,
                             fontWeight = FontWeight.Medium,

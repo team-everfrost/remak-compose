@@ -6,17 +6,21 @@ import android.net.Uri
 import android.os.Build
 import android.os.Build.VERSION
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import com.everfrost.remak_compose.ui.theme.Remak_composeTheme
 import com.everfrost.remak_compose.ui.theme.white
 import com.everfrost.remak_compose.view.RemakApp
-import com.everfrost.remak_compose.view.RemakScreen
+import com.everfrost.remak_compose.viewModel.SplashViewModel
 import com.everfrost.remak_compose.viewModel.home.add.AddViewModel
 import com.everfrost.remak_compose.viewModel.home.main.HomeMainViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -35,6 +39,7 @@ class MainApplication : Application() {
 class MainActivity : ComponentActivity() {
     private val addViewModel: AddViewModel by viewModels()
     private val homeMainViewModel: HomeMainViewModel by viewModels()
+    private val splashViewModel: SplashViewModel by viewModels()
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
@@ -43,6 +48,11 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d("SplashScreen", "onCreate")
+        installSplashScreen().setKeepOnScreenCondition {
+            Log.d("SplashScreen", "isReady: ${splashViewModel.isReady.value}")
+            !splashViewModel.isReady.value
+        }
         super.onCreate(savedInstanceState)
         handleIncomingShare(intent)
 
@@ -57,15 +67,19 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+
         setContent {
-            Remak_composeTheme {
-                Surface(
-                    color = white
-                ) {
-                    RemakApp(
-                        startDestination = RemakScreen.Profile.route,
-                        homeMainViewModel = homeMainViewModel
-                    )
+            val startDestination by splashViewModel.screen.collectAsState()
+            if (splashViewModel.isReady.collectAsState().value) {
+                Remak_composeTheme {
+                    Surface(
+                        color = white
+                    ) {
+                        RemakApp(
+                            startDestination = startDestination,
+                            homeMainViewModel = homeMainViewModel
+                        )
+                    }
                 }
             }
         }

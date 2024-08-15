@@ -45,6 +45,29 @@ fun OnboardingScreen(
     navController: NavController
 ) {
 
+    val largeRecList = listOf(
+        LargeRec("메모.txt", R.drawable.icon_memo),
+        LargeRec("통신문.jpg", R.drawable.icon_picture),
+        LargeRec("이번주 저널", R.drawable.icon_link),
+        LargeRec("문서.hwp", R.drawable.icon_file),
+        LargeRec("메모.txt", R.drawable.icon_memo),
+        LargeRec("통신문.jpg", R.drawable.icon_picture),
+        LargeRec("이번주 저널", R.drawable.icon_link),
+        LargeRec("문서.hwp", R.drawable.icon_file),
+    )
+
+    val smallRecList = listOf(
+        SmallRec("언론기사", "오늘의 주식 뉴스"),
+        SmallRec("메모", "오늘 해야할 일"),
+        SmallRec("기사", "오늘의 경제"),
+        SmallRec("문서", "오늘의 일정"),
+        SmallRec("언론기사", "오늘의 주식 뉴스"),
+        SmallRec("메모", "오늘 해야할 일"),
+        SmallRec("기사", "오늘의 경제"),
+        SmallRec("문서", "오늘의 일정"),
+
+        )
+
     Scaffold() {
         Box(
             modifier = Modifier
@@ -94,14 +117,20 @@ fun OnboardingScreen(
                             )
                         }
                         Box(modifier = Modifier.padding(top = 43.dp))
-                        AutoScrollingLazyRow(list = (1..8).take(4)) {
-                            LargeRecWidget(title = "최신글.jpg", image = R.drawable.icon_picture)
+                        AutoScrollingLazyRow(list = (1..8).take(4)) { index ->
+                            LargeRecWidget(
+                                title = largeRecList[index].title,
+                                image = largeRecList[index].image
+                            )
 
                         }
                         Spacer(modifier = Modifier.height(10.dp))
 
-                        AutoScrollingLazyRow(list = (1..8).take(4)) {
-                            SmallRectWidget()
+                        AutoScrollingLazyRow(list = (1..8).take(4)) { index ->
+                            SmallRectWidget(
+                                title = smallRecList[index].title,
+                                description = smallRecList[index].description
+                            )
                         }
 
 
@@ -160,4 +189,15 @@ fun OnboardingScreen(
 
     }
 }
+
+
+data class LargeRec(
+    val title: String,
+    val image: Int
+)
+
+data class SmallRec(
+    val title: String,
+    val description: String,
+)
 

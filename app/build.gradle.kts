@@ -93,6 +93,8 @@ dependencies {
     implementation(libs.telephoto)
     //shimmer
     implementation(libs.shimmer)
+    //splash
+    implementation(libs.splash)
 
 }
 

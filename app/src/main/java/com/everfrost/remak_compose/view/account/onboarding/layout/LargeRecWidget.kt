@@ -21,7 +21,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.everfrost.remak_compose.R
 import com.everfrost.remak_compose.ui.theme.pretendard
 import com.everfrost.remak_compose.ui.theme.primaryBlue
 
@@ -54,7 +53,7 @@ fun LargeRecWidget(
             ) {
                 Text(
                     modifier = Modifier.align(Alignment.Center),
-                    text = "test", color = primaryBlue, style = TextStyle(
+                    text = title, color = primaryBlue, style = TextStyle(
                         fontFamily = pretendard,
                         fontWeight = FontWeight.Medium,
                         fontSize = 12.sp
@@ -69,7 +68,7 @@ fun LargeRecWidget(
                     .align(Alignment.End)
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.icon_picture),
+                    painter = painterResource(id = image),
                     contentDescription = null,
                     modifier = Modifier
                         .size(36.dp)

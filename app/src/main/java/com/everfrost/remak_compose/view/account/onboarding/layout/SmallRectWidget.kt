@@ -22,7 +22,10 @@ import com.everfrost.remak_compose.ui.theme.primaryBlue
 
 
 @Composable
-fun SmallRectWidget() {
+fun SmallRectWidget(
+    title: String,
+    description: String
+) {
     Box(
         modifier = Modifier
             .padding(6.dp)
@@ -46,7 +49,7 @@ fun SmallRectWidget() {
             ) {
                 Text(
                     modifier = Modifier.align(Alignment.Center),
-                    text = "메모", color = primaryBlue, style = TextStyle(
+                    text = title, color = primaryBlue, style = TextStyle(
                         fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
                         fontSize = 11.sp,
                         fontFamily = pretendard,
@@ -56,7 +59,7 @@ fun SmallRectWidget() {
             Spacer(modifier = Modifier.weight(1f))
             Text(
                 modifier = Modifier.align(Alignment.CenterVertically),
-                text = "오늘의 주식 뉴스", color = Color.Black, style = TextStyle(
+                text = description, color = Color.Black, style = TextStyle(
                     fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
                     fontSize = 11.sp,
                     fontFamily = pretendard,

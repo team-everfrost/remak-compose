@@ -6,14 +6,14 @@ plugins {
 }
 
 android {
-    namespace = "com.everfrost.remak_compose"
+    namespace = "com.everfrost.remak"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.everfrost.remak_compose"
+        applicationId = "com.everfrost.remak"
         minSdk = 27
         targetSdk = 34
-        versionCode = 20
+        versionCode = 30
         versionName = "2.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

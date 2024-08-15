@@ -1,4 +1,4 @@
-package com.everfrost.remak_compose.view.account.register
+package com.everfrost.remak_compose.view.account.resetPassword
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -36,13 +36,15 @@ import com.everfrost.remak_compose.view.RemakScreen
 import com.everfrost.remak_compose.view.account.widget.textfield.AccountTextField
 import com.everfrost.remak_compose.view.common.appbar.BackTitleAppBar
 import com.everfrost.remak_compose.view.common.button.PrimaryButton
-import com.everfrost.remak_compose.viewModel.account.register.RegisterViewModel
+import com.everfrost.remak_compose.viewModel.account.resetPassword.ResetPasswordViewModel
+
 
 @Composable
-fun Register3Screen(
+fun ResetPasswordScreen3(
     navController: NavController,
-    viewModel: RegisterViewModel
+    viewModel: ResetPasswordViewModel
 ) {
+
     val password by viewModel.password.collectAsState()
     val isLengthValid by viewModel.isLengthValid.collectAsState()
     val isContainNumber by viewModel.isContainNumber.collectAsState()
@@ -54,7 +56,7 @@ fun Register3Screen(
         topBar = {
             BackTitleAppBar(
                 navController = navController,
-                title = "회원가입"
+                title = "비밀번호 변경"
             )
         },
 
@@ -162,7 +164,7 @@ fun Register3Screen(
                         .fillMaxWidth()
                         .height(63.dp),
                     onClick = {
-                        navController.navigate(RemakScreen.Register4.route)
+                        navController.navigate(RemakScreen.ResetPassword4.route)
                     },
                     isEnable = isPasswordValid,
                     text = "다음"

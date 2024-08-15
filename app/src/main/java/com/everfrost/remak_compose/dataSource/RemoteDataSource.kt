@@ -29,6 +29,17 @@ interface RemoteDataSource {
         email: String
     ): Response<SignUpModel.CheckVerifyResponseBody>
 
+    suspend fun resetPasswordCode(email: String): Response<SignUpModel.GetVerifyResponseBody>
+    suspend fun checkVerifyResetCode(
+        signupCode: String,
+        email: String
+    ): Response<SignUpModel.CheckVerifyResponseBody>
+
+    suspend fun resetPassword(
+        email: String,
+        password: String
+    ): Response<SignUpModel.CheckVerifyResponseBody>
+
     suspend fun signUp(email: String, password: String): Response<SignUpModel.SignUpResponseBody>
     suspend fun getUserData(): Response<UserModel.Response>
     suspend fun getStorageSize(): Response<UserModel.StorageData>
@@ -157,6 +168,27 @@ class RemoteDataSourceImpl @Inject constructor(
     ): Response<SignUpModel.CheckVerifyResponseBody> {
         val requestBody = SignUpModel.CheckVerifyRequestBody(signupCode, email)
         return apiService.checkVerifyCode(requestBody)
+    }
+
+    override suspend fun resetPasswordCode(email: String): Response<SignUpModel.GetVerifyResponseBody> {
+        val requestBody = SignUpModel.GetVerifyRequestBody(email)
+        return apiService.resetPasswordCode(requestBody)
+    }
+
+    override suspend fun checkVerifyResetCode(
+        signupCode: String,
+        email: String
+    ): Response<SignUpModel.CheckVerifyResponseBody> {
+        val requestBody = SignUpModel.CheckVerifyRequestBody(signupCode, email)
+        return apiService.checkVerifyResetCode(requestBody)
+    }
+
+    override suspend fun resetPassword(
+        email: String,
+        password: String
+    ): Response<SignUpModel.CheckVerifyResponseBody> {
+        val requestBody = SignUpModel.SignUpRequestBody(email, password)
+        return apiService.resetPassword(requestBody)
     }
 
     override suspend fun signUp(

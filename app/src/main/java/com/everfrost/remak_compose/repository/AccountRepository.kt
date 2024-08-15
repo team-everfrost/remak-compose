@@ -16,6 +16,17 @@ interface AccountRepository {
         email: String
     ): APIResponse<SignUpModel.CheckVerifyResponseBody>
 
+    suspend fun resetPasswordCode(email: String): APIResponse<SignUpModel.GetVerifyResponseBody>
+    suspend fun checkVerifyResetCode(
+        signupCode: String,
+        email: String
+    ): APIResponse<SignUpModel.CheckVerifyResponseBody>
+
+    suspend fun resetPassword(
+        email: String,
+        password: String
+    ): APIResponse<SignUpModel.CheckVerifyResponseBody>
+
     suspend fun signUp(email: String, password: String): APIResponse<SignUpModel.SignUpResponseBody>
     suspend fun getUserData(): APIResponse<UserModel.Response>
     suspend fun getStorageSize(): APIResponse<UserModel.StorageData>
@@ -98,6 +109,75 @@ class AccountRepositoryImpl(
     ): APIResponse<SignUpModel.CheckVerifyResponseBody> {
         try {
             val response = remoteDataSource.checkVerifyCode(signupCode, email)
+            return if (response.isSuccessful) {
+                APIResponse.Success(data = response.body())
+            } else {
+                APIResponse.Error(
+                    message = "message: ${
+                        response.errorBody()!!.string()
+                    }",
+                    errorCode = response.code().toString()
+                )
+            }
+        } catch (e: Exception) {
+            return APIResponse.Error(
+                message = "Sign in failed: ${e.message}",
+                errorCode = "500"
+            )
+        }
+    }
+
+    override suspend fun resetPasswordCode(email: String): APIResponse<SignUpModel.GetVerifyResponseBody> {
+        try {
+            val response = remoteDataSource.resetPasswordCode(email)
+            return if (response.isSuccessful) {
+                APIResponse.Success(data = response.body())
+            } else {
+                APIResponse.Error(
+                    message = "message: ${
+                        response.errorBody()!!.string()
+                    }",
+                    errorCode = response.code().toString()
+                )
+            }
+        } catch (e: Exception) {
+            return APIResponse.Error(
+                message = "Sign in failed: ${e.message}",
+                errorCode = "500"
+            )
+        }
+    }
+
+    override suspend fun checkVerifyResetCode(
+        signupCode: String,
+        email: String
+    ): APIResponse<SignUpModel.CheckVerifyResponseBody> {
+        try {
+            val response = remoteDataSource.checkVerifyResetCode(signupCode, email)
+            return if (response.isSuccessful) {
+                APIResponse.Success(data = response.body())
+            } else {
+                APIResponse.Error(
+                    message = "message: ${
+                        response.errorBody()!!.string()
+                    }",
+                    errorCode = response.code().toString()
+                )
+            }
+        } catch (e: Exception) {
+            return APIResponse.Error(
+                message = "Sign in failed: ${e.message}",
+                errorCode = "500"
+            )
+        }
+    }
+
+    override suspend fun resetPassword(
+        email: String,
+        password: String
+    ): APIResponse<SignUpModel.CheckVerifyResponseBody> {
+        try {
+            val response = remoteDataSource.resetPassword(email, password)
             return if (response.isSuccessful) {
                 APIResponse.Success(data = response.body())
             } else {

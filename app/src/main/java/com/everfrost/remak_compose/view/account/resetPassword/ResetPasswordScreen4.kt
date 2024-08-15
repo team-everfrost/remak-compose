@@ -1,4 +1,4 @@
-package com.everfrost.remak_compose.view.account.register
+package com.everfrost.remak_compose.view.account.resetPassword
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -13,7 +13,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,32 +32,42 @@ import com.everfrost.remak_compose.view.RemakScreen
 import com.everfrost.remak_compose.view.account.widget.textfield.AccountTextField
 import com.everfrost.remak_compose.view.common.appbar.BackTitleAppBar
 import com.everfrost.remak_compose.view.common.button.PrimaryButton
-import com.everfrost.remak_compose.viewModel.account.register.RegisterViewModel
+import com.everfrost.remak_compose.view.common.dialog.CustomConfirmDialog
+import com.everfrost.remak_compose.viewModel.account.resetPassword.ResetPasswordViewModel
+
 
 @Composable
-fun Register4Screen(
+fun ResetPasswordScreen4(
     navController: NavController,
-    viewModel: RegisterViewModel
+    viewModel: ResetPasswordViewModel
 ) {
+
     val password by viewModel.password.collectAsState()
     var passwordCheck by remember { mutableStateOf("") }
-    val registerSuccess by viewModel.registerSuccess.collectAsState()
+    val isResetSuccess by viewModel.isResetSuccess.collectAsState()
 
-    LaunchedEffect(registerSuccess) {
-        if (registerSuccess) {
-            navController.navigate(RemakScreen.Main.route) {
-                popUpTo(0) {
-                    inclusive = true
-                }
-            }
-        }
+
+    when {
+        isResetSuccess ->
+            CustomConfirmDialog(
+                onDismissRequest = {
+                    navController.navigate(RemakScreen.OnBoarding.route) {
+                        popUpTo(0) {
+                            inclusive = true
+                        }
+                    }
+                },
+                mainTitle = "비밀번호가 변경되었습니다",
+                subTitle = "다시 로그인해주세요",
+                btnText = "확인"
+            )
     }
     Scaffold(
         containerColor = white,
         topBar = {
             BackTitleAppBar(
                 navController = navController,
-                title = "회원가입"
+                title = "비밀번호 변경"
             )
         },
 
@@ -107,7 +116,7 @@ fun Register4Screen(
                         .fillMaxWidth()
                         .height(63.dp),
                     onClick = {
-                        viewModel.register()
+                        viewModel.resetPassword()
                     },
                     isEnable = password == passwordCheck,
                     text = "완료"

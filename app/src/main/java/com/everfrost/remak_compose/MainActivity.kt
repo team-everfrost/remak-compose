@@ -63,7 +63,7 @@ class MainActivity : ComponentActivity() {
                     color = white
                 ) {
                     RemakApp(
-                        startDestination = RemakScreen.RegisterAgree.route,
+                        startDestination = RemakScreen.ResetPassword1.route,
                         homeMainViewModel = homeMainViewModel
                     )
                 }

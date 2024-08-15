@@ -29,6 +29,10 @@ import com.everfrost.remak_compose.view.account.register.Register1Screen
 import com.everfrost.remak_compose.view.account.register.Register3Screen
 import com.everfrost.remak_compose.view.account.register.Register4Screen
 import com.everfrost.remak_compose.view.account.register.RegisterAgreeScreen
+import com.everfrost.remak_compose.view.account.resetPassword.ResetPasswordScreen1
+import com.everfrost.remak_compose.view.account.resetPassword.ResetPasswordScreen2
+import com.everfrost.remak_compose.view.account.resetPassword.ResetPasswordScreen3
+import com.everfrost.remak_compose.view.account.resetPassword.ResetPasswordScreen4
 import com.everfrost.remak_compose.view.account.signin.SignInScreen
 import com.everfrost.remak_compose.view.collection.AddCollectionScreen
 import com.everfrost.remak_compose.view.collection.CollectionDetailScreen
@@ -57,6 +61,10 @@ enum class RemakScreen(val route: String, val title: String, val icon: Int? = nu
     Register2("Register2", "회원가입 2단계"),
     Register3("Register3", "회원가입 3단계"),
     Register4("Register4", "회원가입 4단계"),
+    ResetPassword1("ResetPassword1", "비밀번호 재설정 1단계"),
+    ResetPassword2("ResetPassword2", "비밀번호 재설정 2단계"),
+    ResetPassword3("ResetPassword3", "비밀번호 재설정 3단계"),
+    ResetPassword4("ResetPassword4", "비밀번호 재설정 4단계"),
     Main("Main", "메인", icon = R.drawable.icon_home),
     Search("Search", "검색", icon = R.drawable.icon_search),
     Tag("Tag", "태그", icon = R.drawable.icon_tag),
@@ -198,9 +206,55 @@ fun RemakApp(
             )
         }
 
+        composableWithAnimation(
+            route = RemakScreen.ResetPassword1.route,
+        ) { navBackStackEntry ->
+            val parentEntry = remember(navBackStackEntry) {
+                navController.getBackStackEntry(RemakScreen.ResetPassword1.route)
+            }
+            ResetPasswordScreen1(
+                navController = navController,
+                viewModel = hiltViewModel(parentEntry),
+            )
+        }
 
+        composableWithAnimation(
+            route = RemakScreen.ResetPassword2.route,
+        ) { navBackStackEntry ->
+            val parentEntry = remember(navBackStackEntry) {
+                navController.getBackStackEntry(RemakScreen.ResetPassword1.route)
+            }
+            ResetPasswordScreen2(
+                navController = navController,
+                viewModel = hiltViewModel(parentEntry)
+            )
+        }
 
+        composableWithAnimation(
+            route = RemakScreen.ResetPassword3.route,
+        ) { navBackStackEntry ->
+            val parentEntry = remember(navBackStackEntry) {
+                navController.getBackStackEntry(RemakScreen.ResetPassword1.route)
+            }
+            ResetPasswordScreen3(
+                navController = navController,
+                viewModel = hiltViewModel(parentEntry)
 
+            )
+        }
+
+        composableWithAnimation(
+            route = RemakScreen.ResetPassword4.route,
+        ) { navBackStackEntry ->
+            val parentEntry = remember(navBackStackEntry) {
+                navController.getBackStackEntry(RemakScreen.ResetPassword1.route)
+            }
+            ResetPasswordScreen4(
+                navController = navController,
+                viewModel = hiltViewModel(parentEntry)
+
+            )
+        }
 
         composable(
             route = RemakScreen.Main.route,

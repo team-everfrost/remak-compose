@@ -43,6 +43,17 @@ interface ApiService {
     @POST("auth/local/signup")
     suspend fun signUp(@Body body: SignUpModel.SignUpRequestBody): retrofit2.Response<SignUpModel.SignUpResponseBody>
 
+    //비밀번호 변경
+    @POST("auth/reset-code")
+    suspend fun resetPasswordCode(@Body body: SignUpModel.GetVerifyRequestBody): retrofit2.Response<SignUpModel.GetVerifyResponseBody>
+
+    @POST("auth/verify-reset-code")
+    suspend fun checkVerifyResetCode(@Body body: SignUpModel.CheckVerifyRequestBody): retrofit2.Response<SignUpModel.CheckVerifyResponseBody>
+
+    @POST("auth/reset-password")
+    suspend fun resetPassword(@Body body: SignUpModel.SignUpRequestBody): retrofit2.Response<SignUpModel.CheckVerifyResponseBody>
+
+
     //로그인
     @POST("auth/local/login")
     suspend fun signIn(@Body body: SignInModel.RequestBody): retrofit2.Response<SignInModel.ResponseBody>

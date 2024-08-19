@@ -141,18 +141,18 @@ fun HomeMainScreen(
         }
     }
 
-    val resultState = remember {
-        navController.currentBackStackEntry?.savedStateHandle?.getLiveData<Boolean>("isUpdate")
-    }
-
-    LaunchedEffect(resultState) {
-        Log.d("HomeMainScreen", "resultState: ${resultState?.value}")
-        if (resultState?.value == true) {
+    LaunchedEffect(navController.currentBackStackEntry?.savedStateHandle?.getLiveData<Boolean>("isUpdate")) {
+        val resultState =
+            navController.currentBackStackEntry?.savedStateHandle?.getLiveData<Boolean>("isUpdate")?.value
+        Log.d("HomeMainScreen", "resultState: $resultState")
+        if (resultState == true) {
             viewModel.resetMainList()
             viewModel.fetchMainList()
-            Log.d("HomeMainScreen", "resultState: ${resultState.value}")
+            navController.currentBackStackEntry?.savedStateHandle?.set(
+                "isUpdate",
+                null
+            ) // 이후 상태 초기화
         }
-
     }
 
     LaunchedEffect(scrollState, viewModel.isDataEnd) {

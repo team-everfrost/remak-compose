@@ -1,5 +1,6 @@
 package com.everfrost.remak.view.home.add
 
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -15,8 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
@@ -48,7 +47,12 @@ fun AddScreen(
 
     val uploadState by viewModel.uploadState.collectAsState()
 
-    val tmpDialog = remember { mutableStateOf(false) }
+    LaunchedEffect(navController.currentBackStackEntry?.savedStateHandle?.getLiveData<Boolean>("isUpdate")) {
+        val resultState =
+            navController.currentBackStackEntry?.savedStateHandle?.getLiveData<Boolean>("isUpdate")?.value
+        Log.d("HomeMainScreen", "resultState: $resultState")
+
+    }
 
     LaunchedEffect(uploadState) {
         if (uploadState == UploadState.LOADING) {
@@ -118,7 +122,7 @@ fun AddScreen(
 
                 AddRowButton(
                     onClick = {
-                        tmpDialog.value = true
+                        navController.navigate(RemakScreen.MemoAdd.route)
                     },
                     modifier = Modifier
                         .padding(top = 24.dp)

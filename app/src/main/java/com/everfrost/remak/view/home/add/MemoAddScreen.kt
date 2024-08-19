@@ -14,6 +14,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -39,16 +42,26 @@ fun MemoAddScreen(
     val memoText by viewModel.memoText.collectAsState()
     val isActionComplete by viewModel.isActionComplete.collectAsState()
 
+    var tmpState by remember {
+        mutableStateOf(false)
+    }
+
+
+
     when {
         isActionComplete -> {
             CustomConfirmDialog(
                 onDismissRequest = {
                     viewModel.setIsActionComplete(false)
+                    tmpState = true
+                    navController.previousBackStackEntry?.savedStateHandle?.set("isUpdate", true)
                     navController.navigate(RemakScreen.Main.route) {
-                        popUpTo(navController.graph.id) {
+                        popUpTo(RemakScreen.Main.route) {
                             inclusive = true
                         }
+                        restoreState = true
                     }
+
                 },
                 mainTitle = "메모가 추가되었습니다",
                 subTitle = "",

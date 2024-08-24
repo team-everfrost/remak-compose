@@ -1,5 +1,6 @@
 package com.everfrost.remak.viewModel.search
 
+import android.util.Log
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -59,6 +60,7 @@ class SearchViewModel @Inject constructor(
     }
 
     fun getEmbeddingSearchResult(query: String) {
+        Log.d("SearchViewModel", "getEmbeddingSearchResult: $query")
         if (isDataEnd.value) return
         _searchListState.value = APIResponse.Loading()
         viewModelScope.launch {
@@ -69,7 +71,7 @@ class SearchViewModel @Inject constructor(
                 data.forEach {
                     tmpList.add(it)
                 }
-                _searchList.value = tmpList
+                _searchList.value = data
             }
         }
     }

@@ -59,8 +59,6 @@ fun SearchScreen(
         focusRequester.requestFocus()
     }
 
-
-
     Scaffold(
         containerColor = bgGray2,
 
@@ -73,9 +71,7 @@ fun SearchScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .padding(top = 40.dp)
-
         ) {
-
             Column(
                 modifier = Modifier.padding(horizontal = 16.dp)
             ) {
@@ -88,6 +84,7 @@ fun SearchScreen(
                 )
                 TagSearchTextField(
                     onEnter = {
+                        debounceJob?.cancel()
                         viewModel.saveSearchHistory(searchContent.text)
                         viewModel.resetSearchResult()
                         viewModel.changeSearchType(SearchType.EMBEDDED)
@@ -105,7 +102,6 @@ fun SearchScreen(
                             } else {
                                 viewModel.getTextSearchResult(it.text)
                                 viewModel.changeSearchType(SearchType.TEXT)
-
                             }
                         }
                     },
@@ -163,8 +159,6 @@ fun SearchScreen(
                                 .fillMaxWidth()
                                 .padding(top = 32.dp)
                         )
-
-
                     }
                 }
             }

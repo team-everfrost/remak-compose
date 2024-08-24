@@ -13,8 +13,8 @@ android {
         applicationId = "com.everfrost.remak"
         minSdk = 27
         targetSdk = 34
-        versionCode = 31
-        versionName = "2.0.1"
+        versionCode = 32
+        versionName = "2.0.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -32,7 +32,7 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
         debug {
-            isMinifyEnabled = true
+            isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

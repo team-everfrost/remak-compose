@@ -84,11 +84,14 @@ fun SearchScreen(
                 )
                 TagSearchTextField(
                     onEnter = {
-                        debounceJob?.cancel()
-                        viewModel.saveSearchHistory(searchContent.text)
-                        viewModel.resetSearchResult()
-                        viewModel.changeSearchType(SearchType.EMBEDDED)
-                        viewModel.getEmbeddingSearchResult(searchContent.text)
+                        coroutineScope.launch {
+                            debounceJob?.cancel()
+                            // debounceJob이 취소된 후 실행될 코드
+                            viewModel.saveSearchHistory(searchContent.text)
+                            viewModel.resetSearchResult()
+                            viewModel.changeSearchType(SearchType.EMBEDDED)
+                            viewModel.getEmbeddingSearchResult(searchContent.text)
+                        }
                     },
                     value = searchContent,
                     onValueChange = {

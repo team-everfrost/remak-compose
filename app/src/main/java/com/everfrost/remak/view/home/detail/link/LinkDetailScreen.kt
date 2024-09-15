@@ -430,9 +430,7 @@ fun LinkDetailScreen(
                         text = "웹 페이지로 이동하기"
                     )
 
-
                 } // Column
-//            }
             }
         }
     }

@@ -25,6 +25,7 @@ import com.everfrost.remak.viewModel.home.add.AddViewModel
 import com.everfrost.remak.viewModel.home.main.HomeMainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.HiltAndroidApp
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @HiltAndroidApp
@@ -62,8 +63,10 @@ class MainActivity : ComponentActivity() {
                 if (isComplete) {
                     Toast.makeText(this@MainActivity, "Remak에 저장했습니다", Toast.LENGTH_SHORT)
                         .show()
+                    delay(200);
                     homeMainViewModel.resetMainList()
                     homeMainViewModel.fetchMainList()
+                    addViewModel.setIsActionComplete(false)
                 }
             }
         }

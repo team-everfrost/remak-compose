@@ -110,6 +110,8 @@ class MainActivity : ComponentActivity() {
                 }
 
             }
+            homeMainViewModel.resetMainList()
+            homeMainViewModel.fetchMainList()
 
         }
     }

@@ -15,11 +15,14 @@ import androidx.activity.viewModels
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import com.everfrost.remak.ui.theme.Remak_composeTheme
 import com.everfrost.remak.ui.theme.white
 import com.everfrost.remak.view.RemakApp
+import com.everfrost.remak.view.common.dialog.CustomShareDialog
 import com.everfrost.remak.viewModel.SplashViewModel
 import com.everfrost.remak.viewModel.home.add.AddViewModel
 import com.everfrost.remak.viewModel.home.main.HomeMainViewModel
@@ -42,6 +45,11 @@ class MainActivity : ComponentActivity() {
     private val homeMainViewModel: HomeMainViewModel by viewModels()
     private val splashViewModel: SplashViewModel by viewModels()
 
+    private var showShareDialog by mutableStateOf(false)
+    private var sharedText by mutableStateOf("")
+    private var sharedUrl by mutableStateOf("")
+    private var combinedText by mutableStateOf("")
+
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         handleIncomingShare(intent)
@@ -63,7 +71,7 @@ class MainActivity : ComponentActivity() {
                 if (isComplete) {
                     Toast.makeText(this@MainActivity, "Remak에 저장했습니다", Toast.LENGTH_SHORT)
                         .show()
-                    delay(200);
+                    delay(200); // 딜레이추가로 새로고침 구현
                     homeMainViewModel.resetMainList()
                     homeMainViewModel.fetchMainList()
                     addViewModel.setIsActionComplete(false)
@@ -74,7 +82,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             val startDestination by splashViewModel.screen.collectAsState()
             if (splashViewModel.isReady.collectAsState().value) {
-                Remak_composeTheme {
+                Remak_composeTheme(
+                    darkTheme = false
+                ) {
                     Surface(
                         color = white
                     ) {
@@ -82,6 +92,24 @@ class MainActivity : ComponentActivity() {
                             startDestination = startDestination,
                             homeMainViewModel = homeMainViewModel
                         )
+
+                        if (showShareDialog) {
+                            CustomShareDialog(
+                                onDismissRequest = { showShareDialog = false },
+                                onMemoClick = {
+                                    addViewModel.addShareMemo(combinedText)
+                                    showShareDialog = false
+                                },
+                                onLinkClick = {
+                                    addViewModel.createShareWebPage(sharedUrl)
+                                    showShareDialog = false
+                                },
+                                mainTitle = "공유 텍스트 저장",
+                                subTitle = "이 텍스트를 어떻게 저장할까요?",
+                                linkBtnText = "링크로 저장",
+                                memoBtnText = "메모로 저장"
+                            )
+                        }
                     }
                 }
             }
@@ -101,7 +129,26 @@ class MainActivity : ComponentActivity() {
                 }
 
                 type == "text/plain" -> {
-                    handleText(intent)
+                    val sharedText = intent.getStringExtra(Intent.EXTRA_TEXT)
+                    if (sharedText != null) {
+                        val (text, url, all) = extractTextAndUrl(sharedText)
+                        when {
+                            url.isNotEmpty() && text.isEmpty() -> {
+                                addViewModel.createShareWebPage(url)
+                            }
+
+                            url.isEmpty() && text.isNotEmpty() -> {
+                                addViewModel.addShareMemo(text)
+                            }
+
+                            url.isNotEmpty() && text.isNotEmpty() -> {
+                                this.sharedUrl = url
+                                this.sharedText = text
+                                this.combinedText = all
+                                showShareDialog = true
+                            }
+                        }
+                    }
                 }
 
                 type.startsWith("application/") || type.startsWith("audio/") || type.startsWith("video/") || type == "*/*" -> {
@@ -150,6 +197,24 @@ class MainActivity : ComponentActivity() {
         }
         if (imageUri != null) {
             addViewModel.processSelectedUris(this, listOf(imageUri))
+        }
+    }
+
+    private fun extractTextAndUrl(input: String): Array<String> {
+        val urlRegex =
+            """(?:https?://)?(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_+.~#?&/=]*)""".toRegex()
+        val match = urlRegex.find(input)
+        return if (match != null) {
+            var url = match.value
+            // URL에 http:// 또는 https://가 없으면 http://를 추가
+            if (!url.startsWith("http://") && !url.startsWith("https://")) {
+                url = "http://$url"
+            }
+            val text = input.replace(match.value, "").trim()
+            arrayOf(text, url, input)
+        } else {
+//            Pair(input.trim(), "")
+            arrayOf(input.trim(), "", input)
         }
     }
 

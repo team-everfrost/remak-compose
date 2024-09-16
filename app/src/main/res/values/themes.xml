@@ -3,8 +3,9 @@
 
     <style name="Theme.Remak_compose" parent="android:Theme.Material.Light.NoActionBar" />
 
-
     <style name="Theme.Remak_compose.Starting" parent="Theme.SplashScreen">
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:statusBarColor">@color/primaryBlue</item>
         <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_splash</item>
         <item name="windowSplashScreenBackground">@color/primaryBlue</item>
         <item name="android:windowNoTitle">true</item>

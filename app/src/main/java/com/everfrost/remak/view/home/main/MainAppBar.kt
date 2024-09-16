@@ -61,11 +61,12 @@ fun MainAppBar(
         targetValue = if (scrollUpState) with(density) { -totalHeight.toPx() } else 0f
     )
 
-//    val position by animateFloatAsState(if (scrollUpState) -190f else 0f)
     var isDropDownExpanded by remember { mutableStateOf(false) }
 
 
     Surface(modifier = Modifier.graphicsLayer { translationY = (position) }) {
+
+
         Box(
             modifier = Modifier
                 .fillMaxWidth()

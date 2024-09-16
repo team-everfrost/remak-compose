@@ -109,6 +109,7 @@ fun HomeMainScreen(
                         }
                         launchSingleTop = true
                     }
+                    viewModel.resetMainList()
                 },
                 mainTitle = "로그인 정보가 만료되었습니다",
                 subTitle = "다시 로그인해주세요",

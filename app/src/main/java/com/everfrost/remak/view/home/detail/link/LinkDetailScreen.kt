@@ -106,6 +106,7 @@ fun LinkDetailScreen(
     val webView = remember(linkData) {
         if (linkData.isNotEmpty()) {
             WebView(context).apply {
+                alpha = 0.99F
                 setupWebView()
                 webViewClient = object : WebViewClient() {
                     override fun onPageFinished(view: WebView?, url: String?) {
@@ -228,7 +229,9 @@ fun LinkDetailScreen(
         topBar = {
             DetailAppBar(
                 hasScrolled = hasScrolled,
-                backClick = { navController.popBackStack() },
+                backClick = {
+                    navController.popBackStack()
+                },
                 title = "링크",
                 isShareEnable = false,
                 shareClick = { },

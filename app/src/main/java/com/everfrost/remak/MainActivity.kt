@@ -64,7 +64,9 @@ class MainActivity : ComponentActivity() {
             !splashViewModel.isReady.value
         }
         super.onCreate(savedInstanceState)
-        handleIncomingShare(intent)
+        if (savedInstanceState == null) { //폴더블 상태 변경 시 onCreate가 다시 호출되는데, 이 때 재 저장 방지
+            handleIncomingShare(intent)
+        }
 
         enableEdgeToEdge()
         lifecycleScope.launch {

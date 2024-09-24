@@ -68,7 +68,7 @@ class MainActivity : ComponentActivity() {
             handleIncomingShare(intent)
         }
 
-        enableEdgeToEdge()
+        enableEdgeToEdge() // 전체화면 모드
         lifecycleScope.launch {
             addViewModel.isActionComplete.collect { isComplete ->
                 if (isComplete) {
@@ -216,7 +216,6 @@ class MainActivity : ComponentActivity() {
             val text = input.replace(match.value, "").trim()
             arrayOf(text, url, input)
         } else {
-//            Pair(input.trim(), "")
             arrayOf(input.trim(), "", input)
         }
     }

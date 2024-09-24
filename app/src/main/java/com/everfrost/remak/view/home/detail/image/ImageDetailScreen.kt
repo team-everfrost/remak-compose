@@ -253,7 +253,7 @@ fun ImageDetailScreen(
                         modifier = Modifier.padding(top = 24.dp),
                         tags = tagList,
                         onClick = {
-                            navController.navigate("tagDetail/${it}")
+                            navController.navigate("tagDetail/${tagList[it]}")
                         }
                     )
 

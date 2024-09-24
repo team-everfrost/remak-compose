@@ -169,25 +169,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-
-    private fun handleText(intent: Intent) {
-        val urlRegex = """^(http[s]?://)?[^\s[("<,>]]*\.[^\s[",><]]+$""".toRegex()
-        val sharedText = intent.getStringExtra(Intent.EXTRA_TEXT)
-        if (sharedText != null) {
-            if (sharedText.matches(urlRegex)) {
-                val fullUrl =
-                    if (sharedText.startsWith("http://") || sharedText.startsWith("https://")) {
-                        sharedText
-                    } else {
-                        "http://$sharedText"
-                    }
-                addViewModel.createShareWebPage(fullUrl)
-            } else {
-                addViewModel.addShareMemo(sharedText)
-            }
-        }
-    }
-
     private fun handleFile(intent: Intent) {
         val imageUri: Uri?
         if (VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

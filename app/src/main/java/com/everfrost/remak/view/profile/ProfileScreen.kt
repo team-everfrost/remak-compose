@@ -55,7 +55,7 @@ import com.everfrost.remak.viewModel.profile.ProfileViewModel
 fun ProfileScreen(
     navController: NavController,
     viewModel: ProfileViewModel,
-    resetPasswordViewModel: ResetPasswordViewModel
+    resetPasswordViewModel: ResetPasswordViewModel,
 ) {
 
     val context = LocalContext.current

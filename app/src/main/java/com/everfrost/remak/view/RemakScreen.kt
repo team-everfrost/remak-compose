@@ -406,9 +406,9 @@ fun RemakApp(
             ProfileScreen(
                 navController = navController,
                 viewModel = hiltViewModel(),
-                resetPasswordViewModel = hiltViewModel()
-                
-            )
+                resetPasswordViewModel = hiltViewModel(),
+
+                )
         }
 
         composableWithAnimation(
@@ -420,6 +420,7 @@ fun RemakApp(
             EditProfileScreen(
                 navController = navController,
                 viewModel = hiltViewModel(parentEntry),
+                homeMainViewModel = homeMainViewModel,
                 resetPasswordViewModel = hiltViewModel(parentEntry)
             )
         }

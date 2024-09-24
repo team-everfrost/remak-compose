@@ -41,12 +41,14 @@ import com.everfrost.remak.view.RemakScreen
 import com.everfrost.remak.view.common.appbar.BackTitleAppBar
 import com.everfrost.remak.view.common.dialog.CustomSelectDialog
 import com.everfrost.remak.viewModel.account.resetPassword.ResetPasswordViewModel
+import com.everfrost.remak.viewModel.home.main.HomeMainViewModel
 import com.everfrost.remak.viewModel.profile.ProfileViewModel
 
 @Composable
 fun EditProfileScreen(
     navController: NavController,
     viewModel: ProfileViewModel,
+    homeMainViewModel: HomeMainViewModel,
     resetPasswordViewModel: ResetPasswordViewModel
 ) {
     val email by viewModel.userEmail.collectAsState()
@@ -68,6 +70,7 @@ fun EditProfileScreen(
                 onConfirm = {
                     logoutState = false
                     viewModel.logout()
+                    homeMainViewModel.resetMainList()
                     navController.navigate(RemakScreen.OnBoarding.route) {
                         popUpTo(0) {
                             inclusive = true

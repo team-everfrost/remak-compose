@@ -101,6 +101,7 @@ fun LinkDetailScreen(
     var imageDialog by remember { mutableStateOf(false) }
     var imageUrl by remember { mutableStateOf("") }
     val isSelfShareSuccess by viewModel.isSelfShareSuccess.collectAsState()
+    var isWebViewLoaded by remember { mutableStateOf(false) }
 
 
     val webView = remember(linkData) {
@@ -112,6 +113,7 @@ fun LinkDetailScreen(
                     override fun onPageFinished(view: WebView?, url: String?) {
                         super.onPageFinished(view, url)
                         viewModel.dataLoaded()
+                        isWebViewLoaded = true
                     }
 
                     override fun shouldOverrideUrlLoading(
@@ -415,23 +417,27 @@ fun LinkDetailScreen(
                         )
                     }
 
-                    PrimaryButton(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(52.dp),
-                        onClick = {
-                            val colorSchemeParams = CustomTabColorSchemeParams.Builder()
-                                .setToolbarColor(ContextCompat.getColor(context, R.color.black))
-                                .build()
-                            val customTabsIntent = CustomTabsIntent.Builder()
-                                .setDefaultColorSchemeParams(colorSchemeParams)
-                                .build()
-                            customTabsIntent.launchUrl(context, Uri.parse(url))
+                    if (isWebViewLoaded) {
+                        PrimaryButton(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(52.dp),
+                            onClick = {
+                                val colorSchemeParams = CustomTabColorSchemeParams.Builder()
+                                    .setToolbarColor(ContextCompat.getColor(context, R.color.black))
+                                    .build()
+                                val customTabsIntent = CustomTabsIntent.Builder()
+                                    .setDefaultColorSchemeParams(colorSchemeParams)
+                                    .build()
+                                customTabsIntent.launchUrl(context, Uri.parse(url))
 
-                        },
-                        isEnable = true,
-                        text = "웹 페이지로 이동하기"
-                    )
+                            },
+                            isEnable = true,
+                            text = "웹 페이지로 이동하기"
+                        )
+                    }
+
+                    Box(modifier = Modifier.height(16.dp))
 
                 } // Column
             }

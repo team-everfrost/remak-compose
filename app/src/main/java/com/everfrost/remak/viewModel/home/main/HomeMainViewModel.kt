@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.everfrost.remak.model.APIResponse
 import com.everfrost.remak.model.DeleteModel
 import com.everfrost.remak.model.home.main.MainListModel
+import com.everfrost.remak.repository.DocumentDatabaseRepository
 import com.everfrost.remak.repository.DocumentRepository
 import com.everfrost.remak.repository.MainRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,7 +26,8 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeMainViewModel @Inject constructor(
     private val mainRepository: MainRepository,
-    private val documentRepository: DocumentRepository
+    private val documentRepository: DocumentRepository,
+    private val documentDatabaseRepository: DocumentDatabaseRepository
 ) : ViewModel() {
     private var lastScrollIndex = 0
     private val _scrollUp = MutableStateFlow(false)
@@ -201,6 +203,8 @@ class HomeMainViewModel @Inject constructor(
                             errorCode = response.errorCode ?: "500"
                         )
                     }
+                    documentDatabaseRepository.deleteDocument(data.docId!!)
+
                 }
             }
 

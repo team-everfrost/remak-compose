@@ -15,6 +15,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.everfrost.remak.model.APIResponse
 import com.everfrost.remak.model.home.main.MainListModel
+import com.everfrost.remak.repository.DocumentDatabaseRepository
 import com.everfrost.remak.repository.DocumentRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -37,8 +38,9 @@ import javax.inject.Inject
 @HiltViewModel
 class LinkDetailViewModel @Inject constructor(
     private val documentRepository: DocumentRepository,
+    private val documentDatabaseRepository: DocumentDatabaseRepository
 
-    ) : ViewModel() {
+) : ViewModel() {
     private val _getDetailDataState = MutableStateFlow<APIResponse<MainListModel.DetailResponse>>(
         APIResponse.Empty()
     )
@@ -65,7 +67,6 @@ class LinkDetailViewModel @Inject constructor(
     val isDeleteComplete: StateFlow<Boolean> = _isDeleteComplete
 
     private val _isImageShareReady = MutableStateFlow(false)
-    val isImageShareReady: StateFlow<Boolean> = _isImageShareReady
 
     private val _isSelfShareSuccess = MutableStateFlow(false)
     val isSelfShareSuccess: StateFlow<Boolean> = _isSelfShareSuccess
@@ -74,28 +75,54 @@ class LinkDetailViewModel @Inject constructor(
         _isDataLoaded.value = true
     }
 
+//    fun fetchDetailData(docId: String) {
+//        viewModelScope.launch {
+//            _getDetailDataState.value = documentRepository.getDetailData(docId)
+//            if (_getDetailDataState.value is APIResponse.Success) {
+//                Log.d("FileDetailViewModel", _getDetailDataState.value.data!!.data.toString())
+//                val data = (_getDetailDataState.value as APIResponse.Success).data!!.data
+//                val tmpTagList = mutableListOf<String>()
+//                data.tags.forEach {
+//                    tmpTagList.add(it.toString())
+//                }
+//                _date.value = formatDate(data.createdAt!!)
+//                _title.value = data.title!!
+//                _tagList.value = tmpTagList
+//                _summary.value = formatSummary(data.summary ?: "")
+//                _url.value = data.url!!
+//                _linkData.value = prepareLinkData(data.content!!)
+//                if (data.status != "COMPLETED") {
+//                    _isDataLoaded.value = true
+//                }
+//            } else {
+//                Log.d("FileDetailViewModel", _getDetailDataState.value.message.toString())
+//            }
+//        }
+//    }
+
     fun fetchDetailData(docId: String) {
         viewModelScope.launch {
-            _getDetailDataState.value = documentRepository.getDetailData(docId)
-            if (_getDetailDataState.value is APIResponse.Success) {
-                Log.d("FileDetailViewModel", _getDetailDataState.value.data!!.data.toString())
-                val data = (_getDetailDataState.value as APIResponse.Success).data!!.data
-                val tmpTagList = mutableListOf<String>()
-                data.tags.forEach {
-                    tmpTagList.add(it.toString())
+            documentDatabaseRepository.getDetailData(docId).collect { response ->
+                _getDetailDataState.value = response
+                if (response is APIResponse.Success) {
+                    val data = response.data!!.data
+                    val tmpTagList = data.tags.map { it.toString() }
+                    _date.value = formatDate(data.createdAt!!)
+                    _title.value = data.title!!
+                    _tagList.value = tmpTagList
+                    _summary.value = formatSummary(data.summary ?: "")
+                    _url.value = data.url!!
+                    _linkData.value = prepareLinkData(data.content!!)
+                    if (data.status != "COMPLETED") {
+                        _isDataLoaded.value = true
+                    }
+
+                } else {
+                    Log.d("FileDetailViewModel", _getDetailDataState.value.message.toString())
+
                 }
-                _date.value = formatDate(data.createdAt!!)
-                _title.value = data.title!!
-                _tagList.value = tmpTagList
-                _summary.value = formatSummary(data.summary ?: "")
-                _url.value = data.url!!
-                _linkData.value = prepareLinkData(data.content!!)
-                if (data.status != "COMPLETED") {
-                    _isDataLoaded.value = true
-                }
-            } else {
-                Log.d("FileDetailViewModel", _getDetailDataState.value.message.toString())
             }
+
         }
     }
 

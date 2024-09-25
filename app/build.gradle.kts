@@ -13,8 +13,8 @@ android {
         applicationId = "com.everfrost.remak"
         minSdk = 27
         targetSdk = 34
-        versionCode = 36
-        versionName = "2.0.6"
+        versionCode = 37
+        versionName = "2.0.7"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -91,6 +91,7 @@ dependencies {
     //retrofit
     implementation(libs.retrofit)
     implementation(libs.retrofit.gson)
+    implementation(libs.retrofit.moshi)
     // dataStore
     implementation(libs.dataStore)
     // okHttp
@@ -103,6 +104,11 @@ dependencies {
     implementation(libs.shimmer)
     //splash
     implementation(libs.splash)
+    //room
+    implementation(libs.room)
+    kapt(libs.room.compiler)
+    implementation(libs.room.ktx)
+
 
 }
 

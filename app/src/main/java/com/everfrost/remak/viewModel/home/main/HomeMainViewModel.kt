@@ -63,7 +63,6 @@ class HomeMainViewModel @Inject constructor(
 
     private val _deleteState =
         MutableStateFlow<APIResponse<DeleteModel.ResponseBody>>(APIResponse.Empty())
-    val deleteState: StateFlow<APIResponse<DeleteModel.ResponseBody>> = _deleteState
 
     private val _deleteDialog = MutableStateFlow(false)
     val deleteDialog: StateFlow<Boolean> = _deleteDialog
@@ -84,7 +83,7 @@ class HomeMainViewModel @Inject constructor(
                     _isDataEnd.value = true
                     return@launch
                 }
-                cursor = response.data!!.data.last().createdAt
+                cursor = response.data.data.last().createdAt
                 docID = response.data.data.last().docId
 
                 val tmpData = _mainList.value.toMutableList()
@@ -168,6 +167,7 @@ class HomeMainViewModel @Inject constructor(
         _mainListState.value = APIResponse.Empty()
         _isDataEnd.value = false
         _isInit.value = false
+        currentDateType = null
     }
 
     fun toggleEditMode() {
@@ -203,7 +203,7 @@ class HomeMainViewModel @Inject constructor(
                             errorCode = response.errorCode ?: "500"
                         )
                     }
-                    documentDatabaseRepository.deleteDocument(data.docId!!)
+                    documentDatabaseRepository.deleteDocument(data.docId)
 
                 }
             }

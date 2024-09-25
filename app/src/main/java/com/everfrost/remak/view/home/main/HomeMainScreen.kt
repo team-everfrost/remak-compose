@@ -1,6 +1,5 @@
 package com.everfrost.remak.view.home.main
 
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -145,7 +144,6 @@ fun HomeMainScreen(
     LaunchedEffect(navController.currentBackStackEntry?.savedStateHandle?.getLiveData<Boolean>("isUpdate")) {
         val resultState =
             navController.currentBackStackEntry?.savedStateHandle?.getLiveData<Boolean>("isUpdate")?.value
-        Log.d("HomeMainScreen", "resultState: $resultState")
         if (resultState == true) {
             viewModel.resetMainList()
             viewModel.fetchMainList()

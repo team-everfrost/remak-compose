@@ -40,6 +40,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -107,6 +108,7 @@ fun LinkDetailScreen(
     val webView = remember(linkData) {
         if (linkData.isNotEmpty()) {
             WebView(context).apply {
+
                 alpha = 0.99F
                 setupWebView()
                 webViewClient = object : WebViewClient() {
@@ -392,7 +394,7 @@ fun LinkDetailScreen(
                         modifier = Modifier.padding(top = 24.dp),
                         tags = tagList,
                         onClick = {
-                            navController.navigate("TagDetail/${tagList[it]}")
+//                            navController.navigate("TagDetail/${tagList[it]}")
                         }
                     )
 
@@ -411,6 +413,7 @@ fun LinkDetailScreen(
 
                     if (webView != null) {
                         AndroidView(
+                            modifier = Modifier.alpha(0.99f),
                             factory = {
                                 webView
                             },

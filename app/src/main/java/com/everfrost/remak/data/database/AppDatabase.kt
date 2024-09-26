@@ -8,7 +8,7 @@ import com.everfrost.remak.data.converter.Converters
 import com.everfrost.remak.data.entity.Document
 
 
-@Database(entities = [Document::class], version = 1, exportSchema = false)
+@Database(entities = [Document::class], version = 2, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun documentDao(): DocumentDao

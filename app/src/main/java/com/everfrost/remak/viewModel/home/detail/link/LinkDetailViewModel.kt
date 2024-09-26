@@ -107,9 +107,15 @@ class LinkDetailViewModel @Inject constructor(
                 if (response is APIResponse.Success) {
                     val data = response.data!!.data
                     val tmpTagList = data.tags.map { it.toString() }
+                    Log.d("tagsize", data.tags.size.toString());
+
                     _date.value = formatDate(data.createdAt!!)
                     _title.value = data.title!!
-                    _tagList.value = tmpTagList
+                    if (tmpTagList.isNotEmpty()) {
+                        _tagList.value = tmpTagList
+                    } else {
+                        _tagList.value = emptyList()
+                    }
                     _summary.value = formatSummary(data.summary ?: "")
                     _url.value = data.url!!
                     _linkData.value = prepareLinkData(data.content!!)

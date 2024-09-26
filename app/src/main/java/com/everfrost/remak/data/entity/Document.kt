@@ -6,10 +6,10 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "documents")
 data class Document(
     @PrimaryKey val docId: String,
-    val date: String,
-    val title: String,
+    val date: String?,
+    val title: String?,
     val tagList: List<String?>,
-    val summary: String,
-    val linkData: String,
-    val url: String,
+    val summary: String?,
+    val linkData: String?,
+    val url: String?,
 )

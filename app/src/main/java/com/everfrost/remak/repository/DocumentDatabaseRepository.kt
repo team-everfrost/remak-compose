@@ -55,17 +55,19 @@ class DocumentDatabaseRepository @Inject constructor(
                 val response = api.getDetailData(docId)
                 if (response.isSuccessful && response.body() != null) {
                     val detailResponse = response.body()!!.data
-                    documentDao.insertDocument(
-                        Document(
-                            docId = docId,
-                            date = detailResponse.createdAt!!,
-                            title = detailResponse.title!!,
-                            tagList = detailResponse.tags,
-                            summary = detailResponse.summary!!,
-                            linkData = detailResponse.content!!,
-                            url = detailResponse.url!!,
+                    if (detailResponse.status == "COMPLETED") {
+                        documentDao.insertDocument(
+                            Document(
+                                docId = docId,
+                                date = detailResponse.createdAt,
+                                title = detailResponse.title,
+                                tagList = detailResponse.tags,
+                                summary = detailResponse.summary,
+                                linkData = detailResponse.content,
+                                url = detailResponse.url,
+                            )
                         )
-                    )
+                    }
                     emit(APIResponse.Success(response.body()!!))
                 } else {
                     emit(

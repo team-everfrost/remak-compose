@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
@@ -87,7 +88,7 @@ fun HomeMainScreen(
     val isInit by viewModel.isInit.collectAsState()
     val deleteDialog by viewModel.deleteDialog.collectAsState()
     val isTokenExpired by viewModel.isTokenExpired.collectAsState()
-
+    val coroutineScope = rememberCoroutineScope()
 
     var collectionBottomSheet by remember {
         mutableStateOf(false)
@@ -183,7 +184,15 @@ fun HomeMainScreen(
         containerColor = white,
         bottomBar = {
             if (!isEditMode) {
-                BottomNav(navController = navController)
+                BottomNav(navController = navController,
+                    scrollToTop = {
+                        coroutineScope.launch {
+                            smoothScrollToTop(scrollState)
+
+                        }
+
+
+                    })
             } else {
                 BottomAppBar(
                     containerColor = white,
@@ -470,4 +479,22 @@ fun HomeMainScreen(
 
         }
     }
+}
+
+// 방법 3: 단계적 스크롤
+suspend fun smoothScrollToTop(scrollState: LazyListState) {
+    val firstVisibleItemIndex = scrollState.firstVisibleItemIndex
+
+    // 빠르게 위쪽으로 이동 (전체 거리의 90%까지)
+    val quickScrollTarget = (firstVisibleItemIndex * 0.1).toInt().coerceAtLeast(0)
+    scrollState.scrollToItem(quickScrollTarget)
+
+    // 잠시 대기 (사용자가 빠른 스크롤을 인지할 수 있도록)
+//    delay(100)
+
+    // 남은 거리를 부드럽게 스크롤
+    scrollState.animateScrollToItem(
+        0,
+        scrollOffset = 0,
+    )
 }

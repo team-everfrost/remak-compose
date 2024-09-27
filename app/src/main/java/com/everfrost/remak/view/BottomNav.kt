@@ -32,7 +32,10 @@ import com.everfrost.remak.ui.theme.pretendard
 import com.everfrost.remak.ui.theme.white
 
 @Composable
-fun BottomNav(navController: NavController) {
+fun BottomNav(
+    navController: NavController,
+    scrollToTop: () -> Unit = {},
+) {
     val items = listOf(
         RemakScreen.Main,
         RemakScreen.Search,
@@ -68,6 +71,10 @@ fun BottomNav(navController: NavController) {
                             launchSingleTop = true
                             restoreState = true
                         }
+                    }
+
+                    if (currentRoute == items[0].route && screen.route == items[0].route) {
+                        scrollToTop()
                     }
                 },
                 icon = {

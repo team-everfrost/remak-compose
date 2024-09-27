@@ -394,7 +394,7 @@ fun LinkDetailScreen(
                         modifier = Modifier.padding(top = 24.dp),
                         tags = tagList,
                         onClick = {
-//                            navController.navigate("TagDetail/${tagList[it]}")
+                            navController.navigate("TagDetail/${tagList[it]}")
                         }
                     )
 

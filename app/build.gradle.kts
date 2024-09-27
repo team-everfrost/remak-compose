@@ -13,8 +13,8 @@ android {
         applicationId = "com.everfrost.remak"
         minSdk = 27
         targetSdk = 34
-        versionCode = 39
-        versionName = "2.0.9"
+        versionCode = 41
+        versionName = "2.0.11"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

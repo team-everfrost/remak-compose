@@ -1,3 +1,4 @@
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -53,6 +54,11 @@ fun SearchScreen(
     val searchList by viewModel.searchList.collectAsState()
     val focusRequester = remember { FocusRequester() }
 
+    var previousValue by remember {
+        mutableStateOf(
+            TextFieldValue("")
+        )
+    }
 
     LaunchedEffect(true) {
         viewModel.getSearchHistory()
@@ -96,15 +102,21 @@ fun SearchScreen(
                     value = searchContent,
                     onValueChange = {
                         viewModel.setSearchContent(it)
-                        debounceJob?.cancel()
-                        debounceJob = coroutineScope.launch {
-                            delay(400) // 300ms 딜레이
-                            viewModel.resetSearchResult()
-                            if (it.text.isEmpty()) {
-                                viewModel.changeSearchType(SearchType.NORMAL)
-                            } else {
-                                viewModel.getTextSearchResult(it.text)
-                                viewModel.changeSearchType(SearchType.TEXT)
+                        Log.d("SearchScreen", "onValueChange: ${previousValue.text} ${it.text}")
+                        if (it.text == previousValue.text) { // 뒤로가기 버튼 시 재검색 방지
+                            Log.d("SearchScreen", "onValueChange: same content")
+                        } else {
+                            previousValue = it
+                            debounceJob?.cancel()
+                            debounceJob = coroutineScope.launch {
+                                delay(400) // 300ms 딜레이
+                                viewModel.resetSearchResult()
+                                if (it.text.isEmpty()) {
+                                    viewModel.changeSearchType(SearchType.NORMAL)
+                                } else {
+                                    viewModel.getTextSearchResult(it.text)
+                                    viewModel.changeSearchType(SearchType.TEXT)
+                                }
                             }
                         }
                     },
@@ -117,10 +129,11 @@ fun SearchScreen(
                         .height(60.dp)
                         .clip(RoundedCornerShape(12.dp))
                         .focusRequester(focusRequester) // 포커
+
                 )
 
                 when (searchMode) {
-                    SearchType.NORMAL -> {
+                    SearchType.NORMAL -> { // 초기 상태
                         SearchNormalModeSection(
                             modifier = Modifier
                                 .padding(top = 32.dp)

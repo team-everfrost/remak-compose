@@ -1,5 +1,6 @@
 package com.everfrost.remak.view.search
 
+import android.util.Log
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -36,13 +37,20 @@ fun SearchTextModeSection(
     val isDataEnd by viewModel.isDataEnd.collectAsState()
 
 
-
-    LaunchedEffect(scrollState, viewModel.isDataEnd) {
+    LaunchedEffect(scrollState, viewModel.isDataEnd, searchList) {
         snapshotFlow { scrollState.layoutInfo.visibleItemsInfo }
             .debounce(200L)
             .collect { visibleItems ->
                 val lastVisibleItem = visibleItems.lastOrNull()
-                if (lastVisibleItem != null && lastVisibleItem.index >= searchList.size - 1 && searchListState !is APIResponse.Loading && !isDataEnd) {
+                if (
+                    lastVisibleItem != null &&
+                    lastVisibleItem.index >= searchList.size - 5 &&
+                    searchListState !is APIResponse.Loading
+                ) {
+                    Log.d(
+                        "SearchTextModeSection",
+                        "getTextSearchResult: ${viewModel.searchContent.value.text}"
+                    )
                     viewModel.getTextSearchResult(viewModel.searchContent.value.text)
                 }
             }

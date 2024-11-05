@@ -1,6 +1,5 @@
 package com.everfrost.remak.view.home.detail.image
 
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -25,7 +24,6 @@ fun ImageViewerScreen(
     val thumbnailUrl by viewModel.thumbnailUrl.collectAsState()
 
     Scaffold { innerPadding ->
-        Log.d("ImageViewerScreen", "thumbnailUrl: $thumbnailUrl")
         Box(
             modifier = Modifier
                 .fillMaxSize()

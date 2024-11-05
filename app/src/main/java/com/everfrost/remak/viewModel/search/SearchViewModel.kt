@@ -43,6 +43,7 @@ class SearchViewModel @Inject constructor(
 
 
     fun getTextSearchResult(query: String) {
+        Log.d("SearchViewModel", "getTextSearchResult: $query isDataEnd: ${isDataEnd.value}")
         if (isDataEnd.value) return
         _searchListState.value = APIResponse.Loading()
         viewModelScope.launch {
@@ -53,6 +54,10 @@ class SearchViewModel @Inject constructor(
                 data.forEach {
                     tmpList.add(it)
                 }
+                if (data.size != 20) {
+                    _isDataEnd.value = true
+                }
+                Log.d("dataLength", "getTextSearchResult: ${data.size} offset: $offset")
                 _searchList.value = tmpList
                 offset += 20
             }
@@ -80,6 +85,7 @@ class SearchViewModel @Inject constructor(
     fun resetSearchResult() {
         _searchList.value = emptyList()
         _searchListState.value = APIResponse.Empty()
+        _isDataEnd.value = false
         offset = 0
     }
 

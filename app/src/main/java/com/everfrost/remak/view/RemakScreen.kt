@@ -153,7 +153,10 @@ fun RemakApp(
         composableWithAnimation(
             route = RemakScreen.SignIn.route
         ) { navBackStackEntry ->
-            SignInScreen(navController = navController)
+            SignInScreen(
+                navController = navController,
+                homeMainViewModel = homeMainViewModel,
+            )
         }
 
         composableWithAnimation(

@@ -9,6 +9,7 @@ import com.everfrost.remak.model.home.main.MainListModel
 import com.everfrost.remak.repository.DocumentDatabaseRepository
 import com.everfrost.remak.repository.DocumentRepository
 import com.everfrost.remak.repository.MainRepository
+import com.everfrost.remak.repository.TokenRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -27,7 +28,8 @@ import javax.inject.Inject
 class HomeMainViewModel @Inject constructor(
     private val mainRepository: MainRepository,
     private val documentRepository: DocumentRepository,
-    private val documentDatabaseRepository: DocumentDatabaseRepository
+    private val documentDatabaseRepository: DocumentDatabaseRepository,
+    private val tokenRepository: TokenRepository
 ) : ViewModel() {
     private var lastScrollIndex = 0
     private val _scrollUp = MutableStateFlow(false)
@@ -120,6 +122,7 @@ class HomeMainViewModel @Inject constructor(
 
             } else {
                 if (response.errorCode == "401") {
+                    Log.d("token", "fetchMainList: 토큰 만료")
                     _isTokenExpired.value = true
                 }
             }
@@ -225,6 +228,10 @@ class HomeMainViewModel @Inject constructor(
 
     fun setTokenExpired(isExpired: Boolean) {
         _isTokenExpired.value = isExpired
+        //token delete
+        viewModelScope.launch {
+            tokenRepository.deleteToken()
+        }
     }
 
 

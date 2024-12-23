@@ -46,12 +46,14 @@ import com.everfrost.remak.view.common.appbar.BackTitleAppBar
 import com.everfrost.remak.view.common.button.PrimaryButton
 import com.everfrost.remak.view.tool.customHeightBasedOnWidth
 import com.everfrost.remak.viewModel.account.signin.SignInVIewModel
+import com.everfrost.remak.viewModel.home.main.HomeMainViewModel
 
 
 @ExperimentalMaterial3Api
 @Composable
 fun SignInScreen(
-    navController: NavController
+    navController: NavController,
+    homeMainViewModel: HomeMainViewModel
 ) {
     val viewModel: SignInVIewModel = hiltViewModel()
     val email by viewModel.email.collectAsState()
@@ -65,6 +67,7 @@ fun SignInScreen(
 
     LaunchedEffect(signInState) {
         if (signInState is APIResponse.Success) {
+            homeMainViewModel.resetMainList()
             navController.navigate(RemakScreen.Main.route) {
                 popUpTo(0) {
                     inclusive = true
@@ -202,7 +205,6 @@ fun SignInScreen(
                             viewModel.signIn(email, password)
                         } else {
                             viewModel.checkEmail(email)
-
                         }
                     },
                     isEnable = if (emailCheckState is APIResponse.Success) {

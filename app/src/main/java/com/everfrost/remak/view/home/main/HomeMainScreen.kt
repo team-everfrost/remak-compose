@@ -98,18 +98,20 @@ fun HomeMainScreen(
     )
     val scope = rememberCoroutineScope()
 
+
+
     when {
         isTokenExpired ->
             CustomConfirmDialog(
                 onDismissRequest = {
                     viewModel.setTokenExpired(false)
+
                     navController.navigate(RemakScreen.OnBoarding.route) {
                         popUpTo(0) {
                             inclusive = true
                         }
                         launchSingleTop = true
                     }
-                    viewModel.resetMainList()
                 },
                 mainTitle = "로그인 정보가 만료되었습니다",
                 subTitle = "다시 로그인해주세요",
@@ -188,10 +190,7 @@ fun HomeMainScreen(
                     scrollToTop = {
                         coroutineScope.launch {
                             smoothScrollToTop(scrollState)
-
                         }
-
-
                     })
             } else {
                 BottomAppBar(
@@ -414,7 +413,6 @@ fun HomeMainScreen(
                                         .padding(bottom = 10.dp)
                                         .fillMaxWidth()
                                         .height(170.dp),
-
                                     title = mainList[index].title!!,
                                     date = mainList[index].updatedAt!!,
                                     thumbnailUrl = mainList[index].thumbnailUrl,
@@ -458,6 +456,7 @@ fun HomeMainScreen(
 
                 }
             }
+
             MainAppBar(scrollUpState = scrollUpState,
                 isEditMode = isEditMode,
                 onAddClick = {
